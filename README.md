@@ -2,6 +2,9 @@
 
 一个静态自我介绍站，中英双语，部署在 GitHub Pages。技术栈：**Astro 5 + GitHub Pages**（无后端、零费用）。
 
+- 仓库：https://github.com/AustinChan168/AustinChan168.github.io
+- 线上：https://austinchan168.github.io （英文版 https://austinchan168.github.io/en）
+
 ## 日常改内容
 
 **你只需要改一个文件：`src/data/profile.ts`**
@@ -49,6 +52,44 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 gh auth login --web
 ```
 
+## 发布到线上
+
+当前是 **gh-pages 分支模式**：本地构建，把 `dist/` 推到 `gh-pages` 分支，GitHub Pages 负责托管。
+
+一条命令搞定：
+
+```bash
+cd /Users/austin/WorkBuddy/2026-10-24-13-06-08/whoami-site
+./deploy.sh
+```
+
+推送后约 1 分钟生效。源码本身单独维护在 `main` 分支，互不影响。
+
+## 升级成 GitHub Actions 自动构建
+
+现在这套需要本地跑 `deploy.sh`。想要「push 到 main 就自动构建部署」，需要给 token 补一个 `workflow` 权限：
+
+```bash
+export GH_CONFIG_DIR="$HOME/.workbuddy/binaries/gh/config"
+gh auth login --web --insecure-storage --scopes repo,workflow
+```
+
+授权完成后三步：
+
+```bash
+# 1) 启用工作流文件
+mv .github/workflows/deploy.yml.example .github/workflows/deploy.yml
+
+# 2) 提交并推送
+git add -A && git commit -m "ci: enable GitHub Actions deploy" && git push
+
+# 3) 网页端：Settings → Pages → Source 改成 GitHub Actions
+```
+
+之后什么都不用做，改完 `profile.ts` 直接 `git push` 就行。
+
+> 为什么不一开始就配好？因为 GitHub 规定：OAuth token 没有 `workflow` 权限时，**不允许**创建或修改 `.github/workflows/` 下的文件，push 会直接 403。补权限需要再授权一次，所以先把站点上线，这个作为可选升级。
+
 ## 部署地址
 
 站点会自动根据仓库名算出正确的路径（逻辑写在 `astro.config.mjs` 的 `detectPagesTarget()` 里），不需要手动改配置：
@@ -71,20 +112,17 @@ npm run build   # 重新构建，新的路径会生效
 DEBUG_CONFIG=1 npm run build
 ```
 
-## 以后更新内容
+## 日常操作流程
+
+改完 `src/data/profile.ts` 之后：
 
 ```bash
 cd /Users/austin/WorkBuddy/2026-10-24-13-06-08/whoami-site
-git add .
-git commit -m "update: 更新自我介绍"
-git push
+./deploy.sh        # 构建 + 发布到线上（约 1 分钟生效）
+git add . && git commit -m "update" && git push   # 顺便把源码也存到 GitHub
 ```
 
-或者直接改完 `profile.ts` 后一次跑完：
-
-```bash
-git add . && git commit -m "update" && git push
-```
+本地预览草稿只要 `npm run dev`，不用每次都发布。
 
 ## 文件结构
 
