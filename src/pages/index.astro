@@ -1,0 +1,8 @@
+---
+import PageBody from '../components/PageBody.astro';
+import { getProfile } from '../data/profile';
+
+const t = getProfile('zh');
+---
+
+<PageBody t={t} />

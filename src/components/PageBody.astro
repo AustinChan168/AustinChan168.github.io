@@ -1,0 +1,254 @@
+---
+import '../styles/global.css';
+import { type Profile } from '../data/profile';
+
+interface Props {
+  t: Profile;
+}
+
+const { t } = Astro.props;
+
+const navKeys: Array<keyof typeof t.nav.labels> = [
+  'now',
+  'origin',
+  'direction',
+  'roadmap',
+  'values',
+  'off',
+  'current',
+  'contact',
+];
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<!doctype html>
+<html lang={t.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.title}</title>
+    <meta name="description" content={t.description} />
+    <link rel="icon" href={import.meta.env.BASE_URL + 'favicon.svg'} type="image/svg+xml" />
+    <meta property="og:title" content={t.title} />
+    <meta property="og:description" content={t.description} />
+    <meta property="og:type" content="profile" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <span class="site-header__name">{t.hero.name}</span>
+        <span class="site-header__spacer"></span>
+        <nav class="site-nav" aria-label="sections">
+          {navKeys.map((k) => <a href={`#${k}`}>{t.nav.labels[k]}</a>)}
+        </nav>
+        <a class="lang-toggle" href={import.meta.env.BASE_URL + t.ui.langSwitchHref.replace(/^\//, '')}>
+          {t.ui.langLabel}
+        </a>
+      </div>
+    </header>
+
+    <main class="site">
+      <!-- Hero -->
+      <section class="hero">
+        <p class="hero__label">{t.hero.label}</p>
+        <h1 class="hero__name">{t.hero.name}</h1>
+        <p class="hero__latin">{t.hero.latin}</p>
+        <p class="hero__lead">{t.hero.lead}</p>
+        <ul class="hero__meta">
+          {t.hero.meta.map((m) => <li>{m}</li>)}
+          <li>{t.hero.status}</li>
+        </ul>
+      </section>
+
+      <!-- 01 现在的身份 -->
+      <section class="section" id="now">
+        <div class="section__head">
+          <span class="section__index">01</span>
+          <h2 class="section__title">{t.sections.now.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.now.lead}</p>
+        <dl class="facts">
+          {
+            t.sections.now.facts.map((f) => (
+              <div class="facts__row">
+                <dt class="facts__label">{f.label}</dt>
+                <dd class="facts__value">{f.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 02 起点 -->
+      <section class="section" id="origin">
+        <div class="section__head">
+          <span class="section__index">02</span>
+          <h2 class="section__title">{t.sections.origin.title}</h2>
+        </div>
+        <div class="prose">
+          {t.sections.origin.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 03 方向 -->
+      <section class="section" id="direction">
+        <div class="section__head">
+          <span class="section__index">03</span>
+          <h2 class="section__title">{t.sections.direction.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.direction.lead}</p>
+        <div class="horizons">
+          {
+            t.sections.direction.horizons.map((h) => (
+              <article class="horizon">
+                <p class="horizon__tag">{h.tag}</p>
+                <h3 class="horizon__title">{h.title}</h3>
+                <p class="horizon__body">{h.body}</p>
+                {h.note && <p class="horizon__note">{h.note}</p>}
+              </article>
+            ))
+          }
+        </div>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 04 技术主线 -->
+      <section class="section" id="roadmap">
+        <div class="section__head">
+          <span class="section__index">04</span>
+          <h2 class="section__title">{t.sections.roadmap.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.roadmap.lead}</p>
+        <ol class="roadmap">
+          {
+            t.sections.roadmap.steps.map((s, i) => (
+              <li class="roadmap__item" data-status={s.status}>
+                <div class="roadmap__index">
+                  <span class="roadmap__num">{pad(i + 1)}</span>
+                  <span class="roadmap__dot"></span>
+                  <span class="roadmap__line"></span>
+                </div>
+                <div>
+                  <h3 class="roadmap__title">
+                    {s.title}
+                    <span class:list={['status', `status--${s.status}`]}>{t.ui.statusLabels[s.status]}</span>
+                  </h3>
+                  <p class="roadmap__detail">{s.detail}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="roadmap__rule">{t.sections.roadmap.rule}</p>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 05 价值观 -->
+      <section class="section" id="values">
+        <div class="section__head">
+          <span class="section__index">05</span>
+          <h2 class="section__title">{t.sections.values.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.values.lead}</p>
+        <ul class="notes">
+          {
+            t.sections.values.items.map((v) => (
+              <li class="notes__item">
+                <h3 class="notes__title">{v.title}</h3>
+                <p class="notes__body">{v.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 06 另一面 -->
+      <section class="section" id="off">
+        <div class="section__head">
+          <span class="section__index">06</span>
+          <h2 class="section__title">{t.sections.off.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.off.lead}</p>
+        <ul class="notes">
+          {
+            t.sections.off.items.map((v) => (
+              <li class="notes__item">
+                <h3 class="notes__title">{v.title}</h3>
+                <p class="notes__body">{v.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 07 在做什么 -->
+      <section class="section" id="current">
+        <div class="section__head">
+          <span class="section__index">07</span>
+          <h2 class="section__title">{t.sections.current.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.current.lead}</p>
+        <ol class="roadmap">
+          {
+            t.sections.current.steps.map((s, i) => (
+              <li class="roadmap__item" data-status={s.status}>
+                <div class="roadmap__index">
+                  <span class="roadmap__num">{pad(i + 1)}</span>
+                  <span class="roadmap__dot"></span>
+                  <span class="roadmap__line"></span>
+                </div>
+                <div>
+                  <h3 class="roadmap__title">
+                    {s.title}
+                    <span class:list={['status', `status--${s.status}`]}>{t.ui.statusLabels[s.status]}</span>
+                  </h3>
+                  <p class="roadmap__detail">{s.detail}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <hr class="section__rule" />
+      </section>
+
+      <!-- 08 联系 -->
+      <section class="section" id="contact">
+        <div class="section__head">
+          <span class="section__index">08</span>
+          <h2 class="section__title">{t.sections.contact.title}</h2>
+        </div>
+        <p class="section__lead">{t.sections.contact.lead}</p>
+        <ul class="links">
+          {
+            t.sections.contact.links.map((l) =>
+              l.href ? (
+                <li>
+                  <a class="links__item" href={l.href} rel="me noopener" target="_blank">
+                    {l.label}
+                  </a>
+                </li>
+              ) : (
+                <li>
+                  <span class="links__item links__item--pending">
+                    {l.label}
+                    <span class="links__note">{t.ui.pending}</span>
+                  </span>
+                </li>
+              )
+            )
+          }
+        </ul>
+      </section>
+
+      <footer class="site-footer">
+        <span>{t.ui.lastUpdated}</span>
+        <span class="site-footer__note">{t.ui.footerNote}</span>
+      </footer>
+    </main>
+  </body>
+</html>
