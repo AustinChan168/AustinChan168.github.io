@@ -77,8 +77,8 @@ gh auth login --web --insecure-storage --scopes repo,workflow
 授权完成后三步：
 
 ```bash
-# 1) 启用工作流文件
-mv .github/workflows/deploy.yml.example .github/workflows/deploy.yml
+# 1) 启用工作流文件（注意：必须放到 .github/workflows/ 这个精确路径下）
+mkdir -p .github/workflows && mv deploy.yml.example .github/workflows/deploy.yml
 
 # 2) 提交并推送
 git add -A && git commit -m "ci: enable GitHub Actions deploy" && git push
