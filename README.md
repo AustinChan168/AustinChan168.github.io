@@ -189,6 +189,49 @@ draft: true
 
 两个语言各有一份：`/writing/feed.xml` 和 `/en/writing/feed.xml`。文章列表页顶部有链接。
 
+### 分享封面图
+
+默认封面是 `public/og-default.png`（1200×630）。换掉它就全局生效。
+
+单篇文章想单独指定封面，在 frontmatter 里加一行：
+
+```yaml
+cover: '/covers/my-post.png'
+```
+
+图片放在 `public/` 下。不写就用默认封面。
+
+## 让搜索引擎收录
+
+网站做好了不等于能被搜到，搜索引擎要主动「知道」。已经配好的基础件：
+
+| 文件 | 作用 |
+| --- | --- |
+| `/sitemap.xml` | 把全部页面（含中英对照关系）列给搜索引擎 |
+| `/robots.txt` | 允许抓取，并指明 sitemap 位置 |
+| canonical + hreflang | 避免中英两版互相判定成重复内容 |
+| og / twitter 标签 | 链接分享时的标题、摘要、封面图 |
+
+剩下要你手动做一次的事（各做一次就行，永久有效）：
+
+**1. Google Search Console**（Google 搜索、手机 Chrome）
+
+> https://search.google.com/search-console → 添加资源 → 选「网址前缀」 → 填 `https://austinchan168.github.io/` → 验证方式选 **HTML 文件**（下载文件扔进 `public/`，再 `./deploy.sh`）→ 验证通过后，左侧「站点地图」填 `sitemap.xml` 提交。
+
+**2. Bing 网站管理员工具**（必应搜索、Edge；同时会同步给部分国内渠道）
+
+> https://www.bing.com/webmasters → 可以从 Google Search Console 直接导入，省一次验证。
+
+**3. 百度基本指望不上。**
+
+github.io 域名在国内访问不稳定，百度也极少收录 `.github.io` 子站。想让国内搜索引擎稳定搜到，唯一的办法是买个自己的域名（阿里云 / Cloudflare，几十块一年），在仓库 Settings → Pages → Custom domain 里填上，并把 `astro.config.mjs` 里的 `SITE` 改成新域名后重新发布。在那之前，「能在百度搜到」这件事先别指望。
+
+**4. 时间预期**
+
+提交 sitemap 之后，Google 通常 **3 天到 2 周** 收录；搜索「你的名字」「你的名字 + 关键词」才会出现。急的话在 Search Console 里用「网址检查」手动请求索引，通常几小时到一天。
+
+注意：你现在 `profile.ts` 里名字和简介都还是 `[ ]` 占位符，**搜不到很正常**——搜索引擎抓到的是「你的名字」这四个字。把内容填上之后，再重新提交一次 sitemap。
+
 ## 待办
 
 - [ ] 补 GitHub 与邮箱链接（`profile.ts` 里 contact 段的 href）

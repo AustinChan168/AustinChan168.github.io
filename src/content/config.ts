@@ -21,6 +21,9 @@ const posts = defineCollection({
     tags: z.array(z.string()).default([]),
     // draft: true 的文章只在本地 dev 可见，构建时会被跳过
     draft: z.boolean().default(false),
+    // 可选的分享封面图，写在 public/ 下的相对路径，例如 '/covers/xxx.png'
+    // 不填就用全站统一的默认封面
+    cover: z.string().optional(),
   }),
 });
 

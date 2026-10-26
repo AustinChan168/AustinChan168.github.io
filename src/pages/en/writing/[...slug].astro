@@ -22,6 +22,7 @@ const current = await getPost('en', slug);
   t={t}
   pageTitle={current?.entry.data.title}
   pageDescription={current?.entry.data.summary}
+  pageImage={current?.entry.data.cover}
   path={`/en/writing/${encodeURIComponent(slug)}/`}
 >
   <PostContent locale="en" slug={slug} />

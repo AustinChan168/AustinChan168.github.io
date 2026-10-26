@@ -11,12 +11,14 @@ interface Props {
   t: Profile;
   pageTitle?: string;
   pageDescription?: string;
+  // 分享封面图。不传则用 public/og-default.png
+  pageImage?: string;
   // 本页在站点内的路径，以 / 开头且以 / 结尾，例如 '/writing/first-post/'
   // 用于生成 canonical 和中英互跳的 hreflang；不传则视为首页
   path?: string;
 }
 
-const { t, pageTitle, pageDescription, path = '/' } = Astro.props;
+const { t, pageTitle, pageDescription, pageImage, path = '/' } = Astro.props;
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -39,6 +41,9 @@ const isEnglish = path.startsWith('/en/') || path === '/en/';
 const canonical = absoluteUrl(path);
 const zhUrl = isEnglish ? absoluteUrl(counterpartPath(path)) : canonical;
 const enUrl = isEnglish ? canonical : absoluteUrl(counterpartPath(path));
+
+// 社交平台分享卡片用的封面。放绝对路径，微信/Twitter 抓图时才认。
+const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
 ---
 
 <!doctype html>
@@ -61,9 +66,11 @@ const enUrl = isEnglish ? canonical : absoluteUrl(counterpartPath(path));
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={t.hero.name} />
+    <meta property="og:image" content={ogImage} />
     <meta property="og:locale" content={isEnglish ? 'en_US' : 'zh_CN'} />
     <meta property="og:locale:alternate" content={isEnglish ? 'zh_CN' : 'en_US'} />
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
 
     <slot name="extra-head" />
   </head>
