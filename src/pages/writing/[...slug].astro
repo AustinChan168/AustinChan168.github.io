@@ -1,0 +1,30 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostContent from '../../components/PostContent.astro';
+import { getProfile } from '../../data/profile';
+import { getPost, getPosts } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts('zh');
+  // 只传 slug：Astro 5 里 entry 对象经过 props 序列化会丢掉 render()，
+  // 所以详情页内部再按 slug 取一次。
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { slug: post.slug },
+  }));
+}) satisfies GetStaticPaths;
+
+const { slug } = Astro.props;
+const t = getProfile('zh');
+const current = await getPost('zh', slug);
+---
+
+<BaseLayout
+  t={t}
+  pageTitle={current?.entry.data.title}
+  pageDescription={current?.entry.data.summary}
+  langTarget={`${import.meta.env.BASE_URL}en/writing/${slug}/`}
+>
+  <PostContent locale="zh" slug={slug} />
+</BaseLayout>

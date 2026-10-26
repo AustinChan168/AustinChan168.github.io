@@ -1,0 +1,76 @@
+---
+/**
+ * 全站外壳：html/head/顶栏/页脚。
+ * 首页和博客页都套这一层，保证头部导航和语言切换一致。
+ */
+import '../styles/global.css';
+import { type Profile } from '../data/profile';
+
+interface Props {
+  t: Profile;
+  pageTitle?: string;
+  pageDescription?: string;
+  // 语言切换的目标地址。不传就跳另一个语言的首页
+  langTarget?: string;
+}
+
+const { t, pageTitle, pageDescription, langTarget } = Astro.props;
+
+const BASE = import.meta.env.BASE_URL;
+
+const navKeys: Array<keyof typeof t.nav.labels> = [
+  'now',
+  'origin',
+  'direction',
+  'roadmap',
+  'values',
+  'off',
+  'current',
+  'contact',
+];
+
+const title = pageTitle ? `${pageTitle} · ${t.hero.name}` : t.title;
+const description = pageDescription ?? t.description;
+const langHref = langTarget ?? BASE + t.ui.langSwitchHref.replace(/^\//, '');
+---
+
+<!doctype html>
+<html lang={t.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={BASE + 'favicon.svg'} type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={pageTitle ? 'article' : 'profile'} />
+    <slot name="extra-head" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-header__name" href={BASE}>{t.hero.name}</a>
+        <span class="site-header__spacer"></span>
+        <nav class="site-nav" aria-label="navigation">
+          {navKeys.map((k) => <a href={`${BASE}#${k}`}>{t.nav.labels[k]}</a>)}
+          {
+            t.nav.pages.map((p) => (
+              <a href={BASE + p.href.replace(/^\//, '')}>{p.label}</a>
+            ))
+          }
+        </nav>
+        <a class="lang-toggle" href={langHref}>{t.ui.langLabel}</a>
+      </div>
+    </header>
+
+    <slot />
+
+    <div class="site">
+      <footer class="site-footer">
+        <span>{t.ui.lastUpdated}</span>
+        <span class="site-footer__note">{t.ui.footerNote}</span>
+      </footer>
+    </div>
+  </body>
+</html>

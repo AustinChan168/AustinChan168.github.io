@@ -1,0 +1,97 @@
+---
+/**
+ * 文章详情页的内容部分。
+ * 上一篇 / 下一篇在同语言的文章列表里按时间倒序取相邻项。
+ */
+import { render } from 'astro:content';
+import { getPosts, formatDate, type Locale } from '../lib/posts';
+import { getProfile } from '../data/profile';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+
+const t = getProfile(locale);
+const ui = t.ui.writing;
+const BASE = import.meta.env.BASE_URL;
+
+const writingPrefix = locale === 'zh' ? 'writing' : 'en/writing';
+const posts = await getPosts(locale);
+const index = posts.findIndex((p) => p.slug === slug);
+if (index < 0) {
+  throw new Error(`找不到这篇文章：${locale}/${slug}`);
+}
+
+const current = posts[index];
+const newer = index > 0 ? posts[index - 1] : null;
+const older = index < posts.length - 1 ? posts[index + 1] : null;
+
+const { Content } = await render(current.entry);
+---
+
+<main class="site">
+  <article class="post">
+    <header class="post__head">
+      <h1 class="post__title">{current.entry.data.title}</h1>
+      <p class="post__meta">
+        <time datetime={current.entry.data.date.toISOString()}>
+          {ui.publishedOn} {formatDate(current.entry.data.date, locale)}
+        </time>
+        <span class="writing__dot">·</span>
+        <span>{ui.readingTime.replace('{n}', String(current.minutes))}</span>
+        {
+          current.entry.data.draft && (
+            <>
+              <span class="writing__dot">·</span>
+              <span class="writing__draft">{ui.draftLabel}</span>
+            </>
+          )
+        }
+      </p>
+      {
+        current.entry.data.tags.length > 0 && (
+          <p class="post__tags">
+            {current.entry.data.tags.map((tag: string) => (
+              <span class="writing__tag">{tag}</span>
+            ))}
+          </p>
+        )
+      }
+      <p class="post__summary">{current.entry.data.summary}</p>
+    </header>
+
+    <div class="post__body prose">
+      <Content />
+    </div>
+
+    <p class="writing__back">
+      <a href={`${BASE}${writingPrefix}/`}>← {ui.indexTitle}</a>
+    </p>
+
+    <nav class="post__nav" aria-label="post navigation">
+      <div class="post__nav-side">
+        {
+          older && (
+            <a href={`${BASE}${writingPrefix}/${older.slug}/`}>
+              <span class="post__nav-label">{ui.prevLabel}</span>
+              <span class="post__nav-title">{older.entry.data.title}</span>
+            </a>
+          )
+        }
+      </div>
+      <div class="post__nav-side post__nav-side--right">
+        {
+          newer && (
+            <a href={`${BASE}${writingPrefix}/${newer.slug}/`}>
+              <span class="post__nav-label">{ui.nextLabel}</span>
+              <span class="post__nav-title">{newer.entry.data.title}</span>
+            </a>
+          )
+        }
+      </div>
+    </nav>
+  </article>
+</main>

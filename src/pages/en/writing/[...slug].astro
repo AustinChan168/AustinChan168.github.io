@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostContent from '../../../components/PostContent.astro';
+import { getProfile } from '../../../data/profile';
+import { getPost, getPosts } from '../../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts('en');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { slug: post.slug },
+  }));
+}) satisfies GetStaticPaths;
+
+const { slug } = Astro.props;
+const t = getProfile('en');
+const current = await getPost('en', slug);
+---
+
+<BaseLayout
+  t={t}
+  pageTitle={current?.entry.data.title}
+  pageDescription={current?.entry.data.summary}
+  langTarget={`${import.meta.env.BASE_URL}writing/${slug}/`}
+>
+  <PostContent locale="en" slug={slug} />
+</BaseLayout>

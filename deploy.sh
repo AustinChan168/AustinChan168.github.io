@@ -18,7 +18,15 @@ USER="AustinChan168"
 cd "$REPO_DIR"
 
 echo "==> 构建"
-PATH="/Users/austin/.workbuddy/binaries/node/versions/22.22.2-6/bin:$PATH" npm run build
+# 注意：Astro 构建结束后会清理 dist 里的空目录，某些沙箱/回收站环境不允许删除，
+# 这时它会报一条 [safe-delete] 警告并返回非 0 退出码，但页面其实已经生成好了。
+# 所以这里不直接依赖它的退出码，而是构建后检查产物是否存在。
+PATH="/Users/austin/.workbuddy/binaries/node/versions/22.22.2-6/bin:$PATH" npm run build || true
+
+if [ ! -f "$REPO_DIR/dist/index.html" ]; then
+  echo "构建失败：没有生成 dist/index.html，往上翻看报错原因" >&2
+  exit 1
+fi
 
 echo "==> 取 GitHub token"
 TOKEN=$(GH_CONFIG_DIR="$GH_CONFIG_DIR" "$GH_BIN" auth token)

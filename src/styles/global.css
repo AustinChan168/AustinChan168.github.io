@@ -314,7 +314,7 @@ a:hover {
   }
 }
 
-/* ---------- 正文段落 ---------- */
+/* ---------- 正文段落（首页 + 文章正文共用） ---------- */
 
 .prose p {
   margin: 0 0 1.25rem;
@@ -322,6 +322,120 @@ a:hover {
 
 .prose p:last-child {
   margin-bottom: 0;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.prose h2 {
+  font-size: 1.35rem;
+  margin: 2.4rem 0 0.9rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.prose h3 {
+  font-size: 1.12rem;
+  margin: 1.9rem 0 0.7rem;
+}
+
+.prose h4 {
+  font-size: 1rem;
+  margin: 1.6rem 0 0.6rem;
+  color: var(--ink-soft);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.4rem;
+}
+
+.prose li {
+  margin-bottom: 0.45rem;
+}
+
+.prose li::marker {
+  color: var(--ink-faint);
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose blockquote {
+  margin: 1.5rem 0;
+  padding: 0.15rem 0 0.15rem 1.1rem;
+  border-left: 2px solid var(--accent);
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-soft);
+}
+
+.prose pre {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--bg-soft);
+  line-height: 1.6;
+}
+
+.prose pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.84em;
+}
+
+.prose hr {
+  margin: 2.4rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.prose img {
+  margin: 1.5rem 0;
+  border-radius: 3px;
+  border: 1px solid var(--line-soft);
+}
+
+.prose table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+}
+
+.prose th {
+  background: var(--bg-soft);
+  font-weight: 600;
 }
 
 /* ---------- 方向卡片 ---------- */
@@ -584,5 +698,234 @@ a:hover {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* ---------- 文章列表页 ---------- */
+
+.page-head {
+  padding: clamp(3rem, 10vw, 5.5rem) 0 0;
+}
+
+.page-head__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.8rem;
+}
+
+.page-head__title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 6vw, 2.6rem);
+  letter-spacing: 0.01em;
+  margin: 0 0 0.9rem;
+}
+
+.page-head__lead {
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 34rem;
+}
+
+.page-head__meta {
+  margin: 1.1rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-faint);
+}
+
+.writing__empty {
+  margin: 2.5rem 0 0;
+  padding: 1.5rem 1.6rem;
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.writing {
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+}
+
+.writing__item {
+  border-top: 1px solid var(--line-soft);
+}
+
+.writing__item:last-child {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.writing__link {
+  display: block;
+  border: 0;
+  padding: 1.5rem 0.25rem 1.6rem;
+  transition: padding-left 0.18s ease;
+}
+
+.writing__link:hover {
+  padding-left: 0.7rem;
+}
+
+.writing__title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.3rem;
+  margin: 0 0 0.4rem;
+  color: var(--ink);
+}
+
+.writing__link:hover .writing__title {
+  color: var(--accent);
+}
+
+.writing__summary {
+  margin: 0 0 0.7rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.writing__meta,
+.post__meta,
+.page-head__meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.writing__dot {
+  color: var(--line);
+}
+
+.writing__tag {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  color: var(--ink-soft);
+}
+
+.writing__draft {
+  margin-left: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--doing);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  white-space: nowrap;
+}
+
+.writing__back {
+  margin: 2.5rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+/* ---------- 文章详情页 ---------- */
+
+.post {
+  padding: clamp(2.5rem, 8vw, 4.5rem) 0 0;
+}
+
+.post__head {
+  margin-bottom: 2.2rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.post__title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 5vw, 2.2rem);
+  line-height: 1.3;
+  margin: 0 0 0.9rem;
+}
+
+.post__meta time {
+  white-space: nowrap;
+}
+
+.post__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.7rem 0 0;
+}
+
+.post__summary {
+  margin: 1.1rem 0 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent);
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.post__body {
+  font-size: 1.02rem;
+}
+
+.post__nav {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.post__nav-side {
+  min-width: 0;
+}
+
+.post__nav-side--right {
+  text-align: right;
+}
+
+.post__nav-side a {
+  border: 0;
+  display: block;
+}
+
+.post__nav-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.3rem;
+}
+
+.post__nav-title {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.post__nav-side a:hover .post__nav-title {
+  color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .post__nav {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .post__nav-side--right {
+    text-align: left;
   }
 }

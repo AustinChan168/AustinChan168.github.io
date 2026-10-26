@@ -18,9 +18,8 @@
  *    todo    待开始
  *    blocked 受阻
  *
- *  以后想加博客？
- *    在 src/pages/ 下新建 writing/index.astro 即可，Astro 原生支持 Markdown，
- *    这个数据文件仍然只负责「自我介绍」部分。
+ *  这个文件只管「自我介绍」那一页的文案，以及全站的界面词。
+ *  博客文章不在这里，写在 src/content/posts/<语言>/*.md。
  *
  *  联系方式里 href 留空字符串的链接会自动显示为「待补充」，不会失效。
  */
@@ -71,7 +70,13 @@ export interface Profile {
     meta: string[];
     status: string;
   };
-  nav: { labels: Record<string, string>; top: string };
+  nav: {
+    // 顶部导航：指向首页各个板块的锚点
+    labels: Record<string, string>;
+    // 顶部导航：指向独立页面的链接（如博客）
+    pages: { id: string; label: string; href: string }[];
+    top: string;
+  };
   sections: {
     now: { id: string; title: string; lead: string; facts: Fact[] };
     origin: { id: string; title: string; paragraphs: string[] };
@@ -90,6 +95,18 @@ export interface Profile {
     footerNote: string;
     statusLabels: Record<Status, string>;
     pending: string;
+    writing: {
+      indexTitle: string;
+      indexLead: string;
+      empty: string;
+      backHome: string;
+      publishedOn: string;
+      draftLabel: string;
+      readingTime: string;
+      rssLabel: string;
+      prevLabel: string;
+      nextLabel: string;
+    };
   };
 }
 
@@ -137,6 +154,7 @@ const zh: Profile = {
       current: '在做什么',
       contact: '联系',
     },
+    pages: [{ id: 'writing', label: '文字', href: '/writing' }],
     top: '回到顶部',
   },
   sections: {
@@ -274,6 +292,18 @@ const zh: Profile = {
     footerNote: '[页脚的一句话，比如：这个页面会持续更新。]',
     statusLabels: statusZh,
     pending: '待补充',
+    writing: {
+      indexTitle: '文字',
+      indexLead: '[这一页的导语：说明你在这里写什么类型的东西。]',
+      empty: '还没有文章。第一篇写点什么都行，别等「想好了」才动笔。',
+      backHome: '← 回到首页',
+      publishedOn: '发布于',
+      draftLabel: '草稿',
+      readingTime: '约 {n} 分钟',
+      rssLabel: 'RSS 订阅',
+      prevLabel: '上一篇',
+      nextLabel: '下一篇',
+    },
   },
 };
 
@@ -304,6 +334,7 @@ const en: Profile = {
       current: 'Currently',
       contact: 'Contact',
     },
+    pages: [{ id: 'writing', label: 'Writing', href: '/en/writing' }],
     top: 'Back to top',
   },
   sections: {
@@ -412,6 +443,18 @@ const en: Profile = {
     footerNote: '[One closing line, e.g. This page keeps updating.]',
     statusLabels: statusEn,
     pending: 'pending',
+    writing: {
+      indexTitle: 'Writing',
+      indexLead: '[Lead-in: what kind of things you write here.]',
+      empty: 'No posts yet. Write the first one badly — waiting until it feels ready is the trap.',
+      backHome: '← Home',
+      publishedOn: 'Published',
+      draftLabel: 'Draft',
+      readingTime: '{n} min read',
+      rssLabel: 'RSS feed',
+      prevLabel: 'Previous',
+      nextLabel: 'Next',
+    },
   },
 };
 

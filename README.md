@@ -128,22 +128,70 @@ git add . && git commit -m "update" && git push   # 顺便把源码也存到 Git
 
 ```
 src/
-  data/profile.ts         ← 全部文案，改这里
+  data/profile.ts         ← 自我介绍的全部文案 + 界面词，改这里
   styles/global.css       ← 全部外观，改这里
-  components/PageBody.astro
+  content/
+    config.ts             ← 文章的字段定义（title / summary / date / tags / draft）
+    posts/zh/*.md         ← 中文文章
+    posts/en/*.md         ← 英文文章
+  layouts/BaseLayout.astro    ← html 外壳：顶栏 + 页脚 + 语言切换
+  components/PageBody.astro   ← 首页正文（8 个板块）
+  components/WritingList.astro   ← 文章列表页
+  components/PostContent.astro   ← 文章详情页
+  lib/posts.ts            ← 按语言读文章、算阅读时长、草稿过滤
+  lib/feed.ts             ← RSS 生成
   pages/
-    index.astro           ← 中文版  /
-    en/index.astro        ← 英文版  /en
-.github/workflows/deploy.yml
+    index.astro           ← 中文首页  /
+    en/index.astro        ← 英文首页  /en
+    writing/index.astro   ← 中文文章列表  /writing
+    writing/[...slug].astro      ← 中文文章详情  /writing/<slug>
+    writing/feed.xml.js          ← 中文 RSS
+    en/writing/...        ← 上面三个的英文版
 ```
 
-## 以后想加博客
+## 写博客
 
-在 `src/pages/` 下建 `writing/index.astro`，用 Markdown 写文章即可，Astro 原生支持。届时再引入 Content Collections + 一个列表页，不用动现有代码。
+文章是 Markdown 文件，放在 `src/content/posts/` 下，按语言分目录：
+
+```
+src/content/posts/zh/xxx.md     ← 中文文章  →  /writing/xxx
+src/content/posts/en/xxx.md     ← 英文文章  →  /en/writing/xxx
+```
+
+**同一篇文章的中英两版用同一个文件名**，语言切换时会自动互跳。只写一个语言也没问题，另一个语言的列表里不显示而已。
+
+### 新建一篇文章
+
+复制目录下任意一篇 `.md`，改个文件名，改这段开头（frontmatter）：
+
+```yaml
+---
+title: '文章标题'
+summary: '一句话摘要，会显示在文章列表和 RSS 里'
+date: 2026-10-26
+tags: ['标签一', '标签二']
+draft: true
+---
+```
+
+正文直接写 Markdown。标题、列表、引用、代码块、表格都排版好了，不用操心样式。
+
+### draft 的控制逻辑
+
+| `draft` | 本地 `npm run dev` | 线上 `npm run build` |
+| --- | --- | --- |
+| `true` | 显示（带 Draft 标记） | 不发布 |
+| `false` | 显示 | 发布 |
+
+现在仓库里带一篇示例文章 `[示例] 第一篇文章怎么写`（已发布，为了让你看到效果）。写完自己的第一篇就把它删掉。
+
+### RSS
+
+两个语言各有一份：`/writing/feed.xml` 和 `/en/writing/feed.xml`。文章列表页顶部有链接。
 
 ## 待办
 
-- [ ] 补 GitHub 与邮箱链接（`profile.ts` 里的 TODO）
-- [ ] 更新联系方式、换一张头像或 favicon
-- [ ] 加博客板块 / 项目板块
+- [ ] 补 GitHub 与邮箱链接（`profile.ts` 里 contact 段的 href）
+- [ ] 替换或删除示例文章 `src/content/posts/{zh,en}/first-post.md`
+- [ ] 加项目展示板块
 - [ ] 接一个自定义域名

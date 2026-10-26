@@ -1,0 +1,65 @@
+---
+/**
+ * 文章列表页的内容部分。
+ * 中文页和英文页共用这一个组件，靠 locale 区分。
+ */
+import { getPosts, formatDate, type Locale } from '../lib/posts';
+import { getProfile } from '../data/profile';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const t = getProfile(locale);
+const ui = t.ui.writing;
+const BASE = import.meta.env.BASE_URL;
+
+const posts = await getPosts(locale);
+const writingPrefix = locale === 'zh' ? 'writing' : 'en/writing';
+---
+
+<main class="site">
+  <header class="page-head">
+    <p class="page-head__label">{t.hero.label}</p>
+    <h1 class="page-head__title">{ui.indexTitle}</h1>
+    <p class="page-head__lead">{ui.indexLead}</p>
+    <p class="page-head__meta">
+      <a href={`${BASE}${writingPrefix}/feed.xml`}>{ui.rssLabel}</a>
+    </p>
+  </header>
+
+  {
+    posts.length === 0 ? (
+      <p class="writing__empty">{ui.empty}</p>
+    ) : (
+      <ul class="writing">
+        {posts.map(({ entry, slug, minutes }) => (
+          <li class="writing__item">
+            <a class="writing__link" href={`${BASE}${writingPrefix}/${slug}/`}>
+              <h2 class="writing__title">
+                {entry.data.title}
+                {entry.data.draft && <span class="writing__draft">{ui.draftLabel}</span>}
+              </h2>
+              <p class="writing__summary">{entry.data.summary}</p>
+              <p class="writing__meta">
+                <time datetime={entry.data.date.toISOString()}>
+                  {ui.publishedOn} {formatDate(entry.data.date, locale)}
+                </time>
+                <span class="writing__dot">·</span>
+                <span>{ui.readingTime.replace('{n}', String(minutes))}</span>
+                {entry.data.tags.length > 0 && <span class="writing__dot">·</span>}
+                {entry.data.tags.map((tag: string) => <span class="writing__tag">{tag}</span>)}
+              </p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <p class="writing__back">
+    <a href={BASE}>{ui.backHome}</a>
+  </p>
+</main>
