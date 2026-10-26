@@ -6,6 +6,6 @@ import { getProfile } from '../../data/profile';
 const t = getProfile('zh');
 ---
 
-<BaseLayout t={t} pageTitle={t.ui.writing.indexTitle} langTarget={`${import.meta.env.BASE_URL}en/writing/`}>
+<BaseLayout t={t} pageTitle={t.ui.writing.indexTitle} path="/writing/">
   <WritingList locale="zh" />
 </BaseLayout>

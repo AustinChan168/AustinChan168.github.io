@@ -1,20 +1,22 @@
 ---
 /**
- * 全站外壳：html/head/顶栏/页脚。
+ * 全站外壳：html/head/顶栏/页脚 + 搜索引擎相关的 meta 标签。
  * 首页和博客页都套这一层，保证头部导航和语言切换一致。
  */
 import '../styles/global.css';
 import { type Profile } from '../data/profile';
+import { absoluteUrl, counterpartPath } from '../lib/posts';
 
 interface Props {
   t: Profile;
   pageTitle?: string;
   pageDescription?: string;
-  // 语言切换的目标地址。不传就跳另一个语言的首页
-  langTarget?: string;
+  // 本页在站点内的路径，以 / 开头且以 / 结尾，例如 '/writing/first-post/'
+  // 用于生成 canonical 和中英互跳的 hreflang；不传则视为首页
+  path?: string;
 }
 
-const { t, pageTitle, pageDescription, langTarget } = Astro.props;
+const { t, pageTitle, pageDescription, path = '/' } = Astro.props;
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -31,7 +33,12 @@ const navKeys: Array<keyof typeof t.nav.labels> = [
 
 const title = pageTitle ? `${pageTitle} · ${t.hero.name}` : t.title;
 const description = pageDescription ?? t.description;
-const langHref = langTarget ?? BASE + t.ui.langSwitchHref.replace(/^\//, '');
+
+// canonical 与语言互跳地址都由 path 推导，各页面不用重复写
+const isEnglish = path.startsWith('/en/') || path === '/en/';
+const canonical = absoluteUrl(path);
+const zhUrl = isEnglish ? absoluteUrl(counterpartPath(path)) : canonical;
+const enUrl = isEnglish ? canonical : absoluteUrl(counterpartPath(path));
 ---
 
 <!doctype html>
@@ -42,9 +49,22 @@ const langHref = langTarget ?? BASE + t.ui.langSwitchHref.replace(/^\//, '');
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" href={BASE + 'favicon.svg'} type="image/svg+xml" />
+
+    <!-- 搜索引擎用：声明本页的正版 URL，避免中英两版互相抢排名 -->
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="zh-CN" href={zhUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={zhUrl} />
+
+    <meta property="og:type" content={pageTitle ? 'article' : 'profile'} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content={pageTitle ? 'article' : 'profile'} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={t.hero.name} />
+    <meta property="og:locale" content={isEnglish ? 'en_US' : 'zh_CN'} />
+    <meta property="og:locale:alternate" content={isEnglish ? 'zh_CN' : 'en_US'} />
+    <meta name="twitter:card" content="summary" />
+
     <slot name="extra-head" />
   </head>
   <body>
@@ -60,7 +80,7 @@ const langHref = langTarget ?? BASE + t.ui.langSwitchHref.replace(/^\//, '');
             ))
           }
         </nav>
-        <a class="lang-toggle" href={langHref}>{t.ui.langLabel}</a>
+        <a class="lang-toggle" href={BASE + counterpartPath(path).replace(/^\//, '')}>{t.ui.langLabel}</a>
       </div>
     </header>
 

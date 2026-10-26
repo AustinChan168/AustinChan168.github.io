@@ -63,6 +63,20 @@ export async function getPost(
   return posts.find((p) => p.slug === slug);
 }
 
+/** 把站点内的路径（如 '/writing/first-post/'）转成带域名的绝对地址 */
+export function absoluteUrl(path: string): string {
+  const site = (import.meta.env.SITE ?? '').replace(/\/+$/, '');
+  const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  return `${site}${base}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+/** 中文路径 ↔ 英文路径互转（'/writing/x/' ↔ '/en/writing/x/'） */
+export function counterpartPath(path: string): string {
+  return path.startsWith('/en/') || path === '/en/'
+    ? path.replace(/^\/en/, '') || '/'
+    : `/en${path === '/' ? '/' : path}`;
+}
+
 /** 日期格式化，按语言给不同写法 */
 export function formatDate(date: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {

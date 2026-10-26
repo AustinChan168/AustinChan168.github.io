@@ -43,9 +43,25 @@ cd "$SITE_DIR"
 git init -q -b gh-pages
 git add -A
 git commit -q -m "deploy: update site ($(date '+%Y-%m-%d %H:%M'))"
-git -c http.version=HTTP/1.1 \
-    -c credential.helper="!f() { test \"\$1\" = get && echo username=$USER && echo password=$TOKEN; }; f" \
-    push --force "$REMOTE_URL" gh-pages
+# 推送偶发失败（HTTP2 framing / CONNECT 502 / Empty reply），重试几次
+PUSH_OK=0
+for attempt in 1 2 3; do
+  if git -c http.version=HTTP/1.1 \
+      -c credential.helper="!f() { test \"\$1\" = get && echo username=$USER && echo password=$TOKEN; }; f" \
+      push --force "$REMOTE_URL" gh-pages; then
+    PUSH_OK=1
+    break
+  fi
+  echo "!! 推送失败（第 $attempt 次），5 秒后重试" >&2
+  sleep 5
+done
 
+cd "$REPO_DIR"
 rm -rf "$SITE_DIR"
+
+if [ "$PUSH_OK" != 1 ]; then
+  echo "推送三次都没成功，可能是网络问题，稍后再跑一次 ./deploy.sh" >&2
+  exit 1
+fi
+
 echo "==> 完成，约 1 分钟后刷新 https://austinchan168.github.io/"

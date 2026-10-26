@@ -22,7 +22,7 @@ const current = await getPost('en', slug);
   t={t}
   pageTitle={current?.entry.data.title}
   pageDescription={current?.entry.data.summary}
-  langTarget={`${import.meta.env.BASE_URL}writing/${slug}/`}
+  path={`/en/writing/${encodeURIComponent(slug)}/`}
 >
   <PostContent locale="en" slug={slug} />
 </BaseLayout>
