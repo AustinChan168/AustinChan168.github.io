@@ -22,17 +22,6 @@ const { t, pageTitle, pageDescription, pageImage, path = '/' } = Astro.props;
 
 const BASE = import.meta.env.BASE_URL;
 
-const navKeys: Array<keyof typeof t.nav.labels> = [
-  'now',
-  'origin',
-  'direction',
-  'roadmap',
-  'values',
-  'off',
-  'current',
-  'contact',
-];
-
 const title = pageTitle ? `${pageTitle} · ${t.hero.name}` : t.title;
 const description = pageDescription ?? t.description;
 
@@ -80,7 +69,6 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
         <a class="site-header__name" href={BASE}>{t.hero.name}</a>
         <span class="site-header__spacer"></span>
         <nav class="site-nav" aria-label="navigation">
-          {navKeys.map((k) => <a href={`${BASE}#${k}`}>{t.nav.labels[k]}</a>)}
           {
             t.nav.pages.map((p) => (
               <a href={BASE + p.href.replace(/^\//, '')}>{p.label}</a>
@@ -96,7 +84,7 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
     <div class="site">
       <footer class="site-footer">
         <span>{t.ui.lastUpdated}</span>
-        <span class="site-footer__note">{t.ui.footerNote}</span>
+        {t.ui.footerNote && <span class="site-footer__note">{t.ui.footerNote}</span>}
       </footer>
     </div>
   </body>

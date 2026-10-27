@@ -213,6 +213,11 @@ a:hover {
   max-width: 38rem;
 }
 
+/* 多行简介：第二行开始收紧间距，别每行都隔 2rem */
+.hero__lead + .hero__lead {
+  margin-top: 0.55rem;
+}
+
 .hero__meta {
   display: flex;
   flex-wrap: wrap;

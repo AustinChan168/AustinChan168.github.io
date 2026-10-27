@@ -24,7 +24,7 @@ const writingPrefix = locale === 'zh' ? 'writing' : 'en/writing';
   <header class="page-head">
     <p class="page-head__label">{t.hero.label}</p>
     <h1 class="page-head__title">{ui.indexTitle}</h1>
-    <p class="page-head__lead">{ui.indexLead}</p>
+    {ui.indexLead && <p class="page-head__lead">{ui.indexLead}</p>}
     <p class="page-head__meta">
       <a href={`${BASE}${writingPrefix}/feed.xml`}>{ui.rssLabel}</a>
     </p>
