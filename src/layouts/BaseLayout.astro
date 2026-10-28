@@ -4,6 +4,7 @@
  * 首页和博客页都套这一层，保证头部导航和语言切换一致。
  */
 import '../styles/global.css';
+import BackdropCanvas from '../components/BackdropCanvas.astro';
 import { type Profile } from '../data/profile';
 import { absoluteUrl, counterpartPath } from '../lib/posts';
 
@@ -64,6 +65,8 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
     <slot name="extra-head" />
   </head>
   <body>
+    <BackdropCanvas />
+
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-header__name" href={BASE}>{t.hero.name}</a>

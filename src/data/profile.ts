@@ -3,12 +3,11 @@
  *  这是全站唯一的内容文件。改文案只需要动这里，不用碰任何样式代码。
  * ============================================================================
  *
- *  当前形态：极简版 —— 首页只有 Hero（名字 + 两行简介），博客入口在顶栏。
- *  以后想加回「起点 / 方向 / 主线 / 联系」等板块，看 git 历史里
+ *  当前形态：Hero 主导 —— motto 是页面上最大的一行字，名字放在顶栏里。
+ *  以后想加回「起点 / 方向 / 主线 / 联系 / 项目网格」等板块，看 git 历史里
  *  commit 41ac065 之前的 profile.ts 和 PageBody.astro，整套结构都在。
  *
  *  - zh = 中文版，en = 英文版，两份一一对应。
- *  - lead 里用 \n 分行，每行渲染成一段。
  *  - 改完保存，`npm run dev` 会热更新；`./deploy.sh` 发布上线。
  *  - 博客文章不在这里，写在 src/content/posts/<语言>/*.md。
  */
@@ -23,9 +22,14 @@ export interface Profile {
   description: string;
   hero: {
     label: string;
+    // 顶栏左上角 + 分享卡片里显示的名字
     name: string;
-    // 首页最显眼的自我介绍，\n 分行
+    // 页面上最大的一行字。写你信的那句话，不是写名字
+    motto: string;
+    // motto 下面的一行补充
     lead: string;
+    // Hero 下面的行动按钮。external: true 的会新窗口打开
+    actions: { label: string; href: string; external?: boolean }[];
   };
   nav: {
     // 顶栏指向独立页面的链接（如博客）
@@ -62,7 +66,12 @@ const zh: Profile = {
   hero: {
     label: 'Who am I',
     name: 'Austin Chan',
-    lead: '😶 An observer of the surging technological wave.\n🌸 An undergraduate student studying at a university.',
+    motto: '😶 An observer of the surging technological wave.',
+    lead: '🌸 An undergraduate student studying at a university.',
+    actions: [
+      { label: '文字 →', href: '/writing' },
+      { label: 'GitHub ↗', href: 'https://github.com/AustinChan168', external: true },
+    ],
   },
   nav: {
     pages: [{ id: 'writing', label: '文字', href: '/writing' }],
@@ -98,7 +107,12 @@ const en: Profile = {
   hero: {
     label: 'Who am I',
     name: 'Austin Chan',
-    lead: '😶 An observer of the surging technological wave.\n🌸 An undergraduate student studying at a university.',
+    motto: '😶 An observer of the surging technological wave.',
+    lead: '🌸 An undergraduate student studying at a university.',
+    actions: [
+      { label: 'Writing →', href: '/en/writing' },
+      { label: 'GitHub ↗', href: 'https://github.com/AustinChan168', external: true },
+    ],
   },
   nav: {
     pages: [{ id: 'writing', label: 'Writing', href: '/en/writing' }],

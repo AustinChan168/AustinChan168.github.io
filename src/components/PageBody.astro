@@ -1,7 +1,7 @@
 ---
 /**
  * 首页正文。只在 index.astro 里用，外面套一层 BaseLayout。
- * 当前是极简版：只有 Hero（名字 + 简介行）。
+ * Hero 的视觉重心是 motto，不是名字 —— 名字在顶栏里，滚动时也一直可见。
  * 想加回完整板块结构，看 git 历史里 commit 41ac065 之前的这个文件。
  */
 import { type Profile } from '../data/profile';
@@ -11,14 +11,28 @@ interface Props {
 }
 
 const { t } = Astro.props;
-
-const leadLines = t.hero.lead.split('\n').filter((l) => l.trim() !== '');
+const BASE = import.meta.env.BASE_URL;
 ---
 
 <main class="site">
   <section class="hero">
     <p class="hero__label">{t.hero.label}</p>
-    <h1 class="hero__name">{t.hero.name}</h1>
-    {leadLines.map((line) => <p class="hero__lead">{line}</p>)}
+    <h1 class="hero__motto">{t.hero.motto}</h1>
+    <p class="hero__lead">{t.hero.lead}</p>
+    <div class="hero__actions">
+      {
+        t.hero.actions.map((a, i) =>
+          a.external ? (
+            <a class="button button--ghost" href={a.href} target="_blank" rel="noopener">
+              {a.label}
+            </a>
+          ) : (
+            <a class={i === 0 ? 'button button--primary' : 'button button--ghost'} href={BASE + a.href.replace(/^\//, '')}>
+              {a.label}
+            </a>
+          )
+        )
+      }
+    </div>
   </section>
 </main>

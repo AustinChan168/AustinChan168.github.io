@@ -65,6 +65,25 @@ cd /Users/austin/WorkBuddy/2026-10-24-13-06-08/whoami-site
 
 推送后约 1 分钟生效。源码本身单独维护在 `main` 分支，互不影响。
 
+### 网络不通时的两条备用通道
+
+某些网络环境（尤其是公司/校园网的中间代理）会把 git 走的 `github.com:443` 拦掉，
+表现为 `CONNECT tunnel failed, response 502`。这时 `api.github.com` 往往还是通的。
+项目里留了两条只走 API 的兜底脚本，`deploy.sh` 检测到 git 三次都失败会自动切过去：
+
+```bash
+python3 scripts/deploy-api.py gh-pages          # 把 dist/ 发到 gh-pages
+python3 scripts/push-source-api.py "提交信息"    # 把源码推到 main
+```
+
+两个坑已经踩过并修好了，别再踩一遍：
+
+1. **create-tree 的 `tree[]` 不认 `encoding: base64`**，`content` 一律按 UTF-8 字面量存。
+   直接塞 base64 字符串，线上拿到的就是一坨 base64 文本。现在的写法是文本走 `content`、
+   二进制先单独建 blob 拿 sha。
+2. **必须带 `.nojekyll`**。少了它 Jekyll 会跳过下划线开头的目录，`/_astro/*.css` 全部 404，
+   页面变成裸 HTML。脚本已经自动带上。
+
 ## 升级成 GitHub Actions 自动构建
 
 现在这套需要本地跑 `deploy.sh`。想要「push 到 main 就自动构建部署」，需要给 token 补一个 `workflow` 权限：

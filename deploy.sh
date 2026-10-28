@@ -60,8 +60,13 @@ cd "$REPO_DIR"
 rm -rf "$SITE_DIR"
 
 if [ "$PUSH_OK" != 1 ]; then
-  echo "推送三次都没成功，可能是网络问题，稍后再跑一次 ./deploy.sh" >&2
-  exit 1
+  # git 走的 github.com:443 被中间代理拦掉时（502 CONNECT tunnel failed），
+  # 换成只走 api.github.com 的 API 通道：四次调用，原子提交。
+  echo "!! git 通道不通，改用 API 通道"
+  GH_CONFIG_DIR="$GH_CONFIG_DIR" python3 "$REPO_DIR/scripts/deploy-api.py" gh-pages || {
+    echo "两条通道都失败了，稍后再跑一次 ./deploy.sh" >&2
+    exit 1
+  }
 fi
 
 echo "==> 完成，约 1 分钟后刷新 https://austinchan168.github.io/"

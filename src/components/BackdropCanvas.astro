@@ -1,0 +1,274 @@
+---
+/**
+ * 全站动态背景：一块 fixed 的 canvas，画在内容下面（z-index 0，不吃鼠标事件）。
+ * 三层：缓慢起伏的水波线 → 漂移的墨点 → 墨点之间的连线，鼠标附近有一点微视差与柔光。
+ *
+ * 要点：
+ * - 颜色从 CSS 变量读，深色模式自动跟上；切换系统主题时会重新取色。
+ * - 尊重 prefers-reduced-motion：只画一帧静态纹理，不做动画。
+ * - 页面切到后台时停掉 rAF，回来再继续，省电。
+ * - dpr 上限 2；手机端自动减少粒子数量。
+ */
+---
+
+<canvas class="backdrop" aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.querySelector('.backdrop');
+  if (canvas instanceof HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) initBackdrop(canvas, ctx);
+  }
+
+  function initBackdrop(canvas, ctx) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let dots = [];
+    let rafId = 0;
+    let running = false;
+
+    // 指针位置用 0~1 表示，鼠标没动过时默认停在中间偏上
+    const pointer = { x: 0.5, y: 0.35, tx: 0.5, ty: 0.35, active: false };
+
+    // ---- 配色：跟着 CSS 变量走，深色模式不用写两套 ----
+    let ink = [27, 27, 25];
+    let accent = [79, 93, 67];
+
+    function readColors() {
+      const style = getComputedStyle(document.documentElement);
+      ink = parseColor(style.getPropertyValue('--ink'), ink);
+      accent = parseColor(style.getPropertyValue('--accent'), accent);
+    }
+
+    function parseColor(value, fallback) {
+      const raw = (value || '').trim();
+      const hex = raw.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      if (hex) {
+        let h = hex[1];
+        if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        return [
+          parseInt(h.slice(0, 2), 16),
+          parseInt(h.slice(2, 4), 16),
+          parseInt(h.slice(4, 6), 16),
+        ];
+      }
+      const rgb = raw.match(/rgba?\(([^)]+)\)/);
+      if (rgb) {
+        const parts = rgb[1].split(/[,\s/]+/).filter(Boolean).map(Number);
+        if (parts.length >= 3 && parts.every((n) => !Number.isNaN(n))) {
+          return [parts[0], parts[1], parts[2]];
+        }
+      }
+      return fallback;
+    }
+
+    const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
+
+    // ---- 尺寸：resize / 横竖屏切换都重算 ----
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seed();
+    }
+
+    // ---- 粒子：数量按视口面积算，手机上自动减半 ----
+    function seed() {
+      const area = width * height;
+      const base = Math.round(area / 17000);
+      const count = Math.max(26, Math.min(width < 680 ? 44 : 96, base));
+      dots = [];
+      for (let i = 0; i < count; i += 1) {
+        dots.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: 0.6 + Math.random() * 1.5,
+          vx: (Math.random() - 0.5) * 0.16,
+          vy: (Math.random() - 0.5) * 0.16,
+          depth: 0.35 + Math.random() * 0.65,
+        });
+      }
+    }
+
+    // ---- 每帧绘制 ----
+    function frame(time) {
+      const t = time * 0.001;
+      // 指针平滑跟随，避免抖动
+      pointer.x += (pointer.tx - pointer.x) * 0.05;
+      pointer.y += (pointer.ty - pointer.y) * 0.05;
+
+      ctx.clearRect(0, 0, width, height);
+
+      drawWaves(t);
+      drawDots(t);
+      if (pointer.active) drawHalo();
+
+      // 减弱动效时只画一帧，不排下一帧
+      if (!reduceMotion.matches) rafId = requestAnimationFrame(frame);
+    }
+
+    // 1. 起伏的水波线：三条超淡的长曲线，负责“整页在呼吸”
+    function drawWaves(t) {
+      const lines = 3;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < lines; i += 1) {
+        const baseY = height * (0.28 + i * 0.24);
+        const amp = 26 + i * 12;
+        const speed = 0.06 + i * 0.02;
+        ctx.strokeStyle = rgba(ink, 0.055 - i * 0.008);
+        ctx.beginPath();
+        for (let x = -20; x <= width + 20; x += 12) {
+          const y =
+            baseY +
+            Math.sin(x * 0.0032 + t * speed + i * 1.7) * amp +
+            Math.sin(x * 0.0009 - t * speed * 0.6) * amp * 0.45;
+          if (x === -20) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+
+    // 2/3. 墨点 + 近距离连线
+    function drawDots(t) {
+      const px = pointer.x * width;
+      const py = pointer.y * height;
+      const linkDist = width < 680 ? 108 : 140;
+
+      for (let i = 0; i < dots.length; i += 1) {
+        const d = dots[i];
+        d.x += d.vx;
+        d.y += d.vy;
+
+        // 出界从另一边绕回来
+        if (d.x < -20) d.x = width + 20;
+        else if (d.x > width + 20) d.x = -20;
+        if (d.y < -20) d.y = height + 20;
+        else if (d.y > height + 20) d.y = -20;
+
+        // 鼠标附近的点被轻轻推开，形成微视差
+        if (pointer.active) {
+          const dx = d.x - px;
+          const dy = d.y - py;
+          const dist2 = dx * dx + dy * dy;
+          if (dist2 < 26000 && dist2 > 0.01) {
+            const dist = Math.sqrt(dist2);
+            const push = (1 - dist / 161) * 0.5;
+            d.x += (dx / dist) * push;
+            d.y += (dy / dist) * push;
+          }
+        }
+
+        const breathe = 0.5 + Math.sin(t * 0.5 + i) * 0.12;
+        ctx.fillStyle = rgba(ink, (0.1 + d.depth * 0.16) * breathe);
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.lineWidth = 1;
+      for (let i = 0; i < dots.length; i += 1) {
+        for (let j = i + 1; j < dots.length; j += 1) {
+          const a = dots[i];
+          const b = dots[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist2 = dx * dx + dy * dy;
+          if (dist2 > linkDist * linkDist) continue;
+          const alpha = (1 - Math.sqrt(dist2) / linkDist) * 0.075;
+          ctx.strokeStyle = rgba(ink, alpha);
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // 鼠标位置的一团极淡柔光，让背景跟手
+    function drawHalo() {
+      const px = pointer.x * width;
+      const py = pointer.y * height;
+      const radius = 190;
+      const grad = ctx.createRadialGradient(px, py, 0, px, py, radius);
+      grad.addColorStop(0, rgba(accent, 0.075));
+      grad.addColorStop(1, rgba(accent, 0));
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(px, py, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      rafId = requestAnimationFrame(frame);
+    }
+
+    function stop() {
+      running = false;
+      cancelAnimationFrame(rafId);
+    }
+
+    // ---- 事件 ----
+    let resizeTimer = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(resize, 150);
+    });
+
+    // 只有精细指针（鼠标 / 触控笔）才开视差，触屏划一下不该触发
+    window.addEventListener(
+      'pointermove',
+      (event) => {
+        if (event.pointerType === 'touch') return;
+        pointer.tx = event.clientX / Math.max(window.innerWidth, 1);
+        pointer.ty = event.clientY / Math.max(window.innerHeight, 1);
+        pointer.active = true;
+      },
+      { passive: true }
+    );
+
+    document.addEventListener('pointerleave', () => {
+      pointer.active = false;
+      pointer.tx = 0.5;
+      pointer.ty = 0.35;
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else if (!reduceMotion.matches) start();
+    });
+
+    const onMotionChange = () => {
+      stop();
+      if (reduceMotion.matches) frame(0);
+      else start();
+    };
+    if (typeof reduceMotion.addEventListener === 'function') {
+      reduceMotion.addEventListener('change', onMotionChange);
+    }
+
+    const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const onColorSchemeChange = () => {
+      readColors();
+      if (reduceMotion.matches) frame(0);
+    };
+    if (typeof darkQuery.addEventListener === 'function') {
+      darkQuery.addEventListener('change', onColorSchemeChange);
+    }
+
+    // ---- 启动 ----
+    readColors();
+    resize();
+    if (reduceMotion.matches) frame(0);
+    else start();
+  }
+</script>

@@ -94,6 +94,22 @@ a:hover {
 
 /* ---------- 布局 ---------- */
 
+/* 动态背景画布：铺满视口，压在内容下面，不拦鼠标 */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+/* 内容层要高于画布，否则会被盖住 */
+main,
+.site {
+  position: relative;
+  z-index: 1;
+}
+
 .site {
   max-width: var(--measure);
   margin: 0 auto;
@@ -187,54 +203,63 @@ a:hover {
   margin: 0 0 1.75rem;
 }
 
-.hero__name {
+/* motto 是页面上最大的一行字：写你信的那句话 */
+.hero__motto {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(2.6rem, 9vw, 4rem);
-  line-height: 1.1;
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  line-height: 1.25;
   margin: 0;
-  letter-spacing: 0.02em;
-}
-
-.hero__latin {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.1rem;
-  color: var(--ink-soft);
-  margin: 0.35rem 0 0;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.01em;
+  max-width: 30rem;
 }
 
 .hero__lead {
   font-size: 1.05rem;
   line-height: 1.95;
   color: var(--ink-soft);
-  margin: 2rem 0 0;
+  margin: 1.5rem 0 0;
   max-width: 38rem;
 }
 
-/* 多行简介：第二行开始收紧间距，别每行都隔 2rem */
-.hero__lead + .hero__lead {
-  margin-top: 0.55rem;
-}
+/* ---------- Hero 行动按钮 ---------- */
 
-.hero__meta {
+.hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 1.35rem;
-  margin: 2rem 0 0;
-  padding: 1.15rem 0 0;
-  border-top: 1px solid var(--line);
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.04em;
-  color: var(--ink-faint);
-  list-style: none;
+  gap: 0.75rem;
+  margin: 2.5rem 0 0;
 }
 
-.hero__meta li::before {
-  content: '— ';
-  color: var(--line);
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.35rem;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  background: transparent;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.button--primary {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.button--primary:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
 }
 
 /* ---------- 区块通用 ---------- */
@@ -686,12 +711,6 @@ a:hover {
   .hero,
   .section {
     animation: rise 0.7s cubic-bezier(0.2, 0.6, 0.2, 1) both;
-  }
-  .section:nth-of-type(2) {
-    animation-delay: 0.04s;
-  }
-  .section:nth-of-type(3) {
-    animation-delay: 0.07s;
   }
 }
 
