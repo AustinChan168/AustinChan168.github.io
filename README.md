@@ -154,6 +154,7 @@ src/
     posts/zh/*.md         ← 中文文章
     posts/en/*.md         ← 英文文章
   layouts/BaseLayout.astro    ← html 外壳：顶栏 + 页脚 + 语言切换
+  components/BackdropCanvas.astro ← 全站动态背景（canvas：水波线 + 漂移墨点 + 鼠标微视差）
   components/PageBody.astro   ← 首页正文（8 个板块）
   components/WritingList.astro   ← 文章列表页
   components/PostContent.astro   ← 文章详情页

@@ -95,12 +95,22 @@ a:hover {
 /* ---------- 布局 ---------- */
 
 /* 动态背景画布：铺满视口，压在内容下面，不拦鼠标 */
+/* 上下各留一段渐隐，顶栏和页脚附近不至于被色块压得太吵 */
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: 0;
   display: block;
   pointer-events: none;
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 9%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%);
 }
 
 /* 内容层要高于画布，否则会被盖住 */
