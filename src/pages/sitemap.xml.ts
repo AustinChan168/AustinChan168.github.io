@@ -5,6 +5,7 @@
  * 每个条目都带 hreflang 互指，告诉搜索引擎中英两版是同一内容的不同语言。
  */
 import { getPosts, absoluteUrl, counterpartPath, type Locale } from '../lib/posts';
+import { works } from '../data/works';
 
 export const prerender = true;
 
@@ -37,6 +38,12 @@ export async function GET() {
   ];
 
   for (const locale of ['zh', 'en'] as Locale[]) {
+    // 作品详情页：中英各一份，两版共用同一个 slug
+    const workPrefix = locale === 'zh' ? '/works/' : '/en/works/';
+    for (const work of works) {
+      entries.push({ path: `${workPrefix}${work.slug}/`, lastmod: today });
+    }
+
     // sitemap 里只放正式发布的文章：includeDrafts: false
     const posts = await getPosts(locale, { includeDrafts: false });
     const prefix = locale === 'zh' ? '/writing/' : '/en/writing/';

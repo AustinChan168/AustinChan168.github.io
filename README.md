@@ -7,16 +7,24 @@
 
 ## 日常改内容
 
-**你只需要改一个文件：`src/data/profile.ts`**
+**文案只需要改一个文件：`src/data/profile.ts`**（个人介绍、界面词、Hero、关于、联系方式）
+
+**作品只需要改一个文件：`src/data/works.ts`**（项目卡片 + 详情页正文）
 
 里面 `zh` 是中文版、`en` 是英文版，两份一一对应。改完保存即可，`npm run dev` 会自动热更新。
 
-文件里标了 `TODO` 的地方是需要你补的信息：
+方括号里的内容（`[项目名称]`、`[标签]`、`[you@example.com]`）都是占位符，替换成你自己的就行；想删一整条作品，把 `works` 数组里那个对象删掉即可，首页和详情页会同步消失。
 
-- GitHub 主页地址
-- 常用邮箱
+联系方式里 `href` 留空的那条会显示成虚线占位，不会被包装成死链。
 
-`href` 留空的链接会自动显示为「待补充」，不会失效。
+### 加一个作品
+
+1. 在 `src/data/works.ts` 的 `works` 数组里复制一个对象；
+2. 改 `slug`（URL 用，英文小写带连字符）、`year`、`category`、`tools`；
+3. 写 `text.zh` 和 `text.en` 两份：`title` / `summary` 显示在卡片上，`body` 是详情页正文（一段一个字符串）；
+4. 有封面图就放到 `public/works/` 下，然后填 `cover: '/works/xxx.jpg'`；不填就用自动生成的色块封面。
+
+详情页地址会自动变成 `/works/<slug>/`（英文 `/en/works/<slug>/`），并自动进 sitemap。
 
 ## 本地开发
 
@@ -154,15 +162,21 @@ src/
     posts/zh/*.md         ← 中文文章
     posts/en/*.md         ← 英文文章
   layouts/BaseLayout.astro    ← html 外壳：顶栏 + 页脚 + 语言切换
-  components/BackdropCanvas.astro ← 全站动态背景（canvas：水波线 + 漂移墨点 + 鼠标微视差）
-  components/PageBody.astro   ← 首页正文（8 个板块）
+  components/BackdropCanvas.astro ← 全站动态背景（canvas：网格 + 时间轴色块 + 螺旋）
+  components/PageBody.astro   ← 首页正文（Hero → 作品 → 关于 → 最近写的）
+  components/Works.astro      ← 作品网格 + 分类筛选
+  components/About.astro      ← 个人介绍区（自述 / 标签 / 现在 / 联系）
+  components/WorkDetail.astro ← 作品详情页
   components/WritingList.astro   ← 文章列表页
   components/PostContent.astro   ← 文章详情页
+  data/works.ts           ← 作品数据，加作品改这里
   lib/posts.ts            ← 按语言读文章、算阅读时长、草稿过滤
   lib/feed.ts             ← RSS 生成
   pages/
     index.astro           ← 中文首页  /
     en/index.astro        ← 英文首页  /en
+    works/[slug].astro    ← 中文作品详情  /works/<slug>
+    en/works/[slug].astro ← 英文作品详情  /en/works/<slug>
     writing/index.astro   ← 中文文章列表  /writing
     writing/[...slug].astro      ← 中文文章详情  /writing/<slug>
     writing/feed.xml.js          ← 中文 RSS

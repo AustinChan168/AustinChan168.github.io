@@ -1,0 +1,105 @@
+---
+/**
+ * 作品展示区。数据来自 src/data/works.ts。
+ * 首页用；带一个纯 CSS/原生 JS 的分类筛选（没有 JS 时所有卡片照样显示）。
+ */
+import { type Locale } from '../lib/posts';
+import { getProfile } from '../data/profile';
+import { works, workCategories, categoryLabel } from '../data/works';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getProfile(locale);
+const ui = t.works;
+const BASE = import.meta.env.BASE_URL;
+const prefix = locale === 'zh' ? 'works' : 'en/works';
+
+const items = works.filter((w) => w.text[locale]?.title);
+const usedCategories = workCategories.filter((c) => items.some((w) => w.category === c.key));
+---
+
+<section class="works" id="works">
+  <div class="section__head">
+    <span class="section__index">01</span>
+    <h2 class="section__title">{ui.title}</h2>
+  </div>
+  {ui.lead && <p class="section__lead">{ui.lead}</p>}
+
+  {
+    items.length === 0 ? (
+      <p class="works__empty">{ui.empty}</p>
+    ) : (
+      <>
+        {usedCategories.length > 1 && (
+          <div class="filters" aria-label={ui.title}>
+            <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">
+              {ui.filterAll}
+            </button>
+            {usedCategories.map((c) => (
+              <button class="filter" type="button" data-filter={c.key} aria-pressed="false">
+                {c[locale]}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <ul class="cards">
+          {items.map((w, i) => {
+            const text = w.text[locale];
+            return (
+              <li class="card" data-category={w.category}>
+                <a class="card__link" href={`${BASE}${prefix}/${w.slug}/`}>
+                  <div
+                    class:list={['card__cover', w.cover && 'card__cover--image']}
+                    style={`--card-accent: ${w.accent ?? '#4f5d43'}`}
+                  >
+                    {w.cover && <img src={BASE + w.cover.replace(/^\//, '')} alt="" loading="lazy" />}
+                    <span class="card__num">{String(i + 1).padStart(2, '0')}</span>
+                    <span class="card__cat">{categoryLabel(w.category, locale)}</span>
+                  </div>
+                  <div class="card__body">
+                    <h3 class="card__title">{text.title}</h3>
+                    <p class="card__summary">{text.summary}</p>
+                    <p class="card__meta">
+                      <span>{w.year}</span>
+                      <span class="card__dot">·</span>
+                      <span>{w.tools.join(' / ')}</span>
+                    </p>
+                    <span class="card__more">{ui.viewLabel}</span>
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    )
+  }
+</section>
+
+<script>
+  // 分类筛选。渐进增强：脚本没跑起来时全部卡片可见。
+  const bar = document.querySelector('.filters');
+  if (bar) {
+    const buttons = Array.from(bar.querySelectorAll<HTMLButtonElement>('.filter'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.works .card'));
+
+    bar.addEventListener('click', (event) => {
+      const target = (event.target as HTMLElement).closest<HTMLButtonElement>('.filter');
+      if (!target) return;
+
+      const key = target.dataset.filter ?? 'all';
+      buttons.forEach((b) => {
+        const on = b === target;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      cards.forEach((card) => {
+        card.hidden = key !== 'all' && card.dataset.category !== key;
+      });
+    });
+  }
+</script>

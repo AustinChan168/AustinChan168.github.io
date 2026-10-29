@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import WorkDetail from '../../../components/WorkDetail.astro';
+import { getProfile } from '../../../data/profile';
+import { works, getWork } from '../../../data/works';
+
+export const getStaticPaths = (() =>
+  works.map((work) => ({ params: { slug: work.slug }, props: { slug: work.slug } }))) satisfies GetStaticPaths;
+
+const { slug } = Astro.props;
+const t = getProfile('en');
+const work = getWork(slug);
+if (!work) throw new Error(`Work not found: ${slug}`);
+---
+
+<BaseLayout t={t} pageTitle={work.text.en.title} pageDescription={work.text.en.summary} path={`/en/works/${slug}/`}>
+  <WorkDetail locale="en" work={work} />
+</BaseLayout>

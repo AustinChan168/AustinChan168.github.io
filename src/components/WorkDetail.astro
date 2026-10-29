@@ -1,0 +1,76 @@
+---
+/**
+ * 单个作品的详情页内容。中文 /works/<slug>/、英文 /en/works/<slug>/ 共用。
+ * 页面外壳（head、顶栏、页脚）在外层 BaseLayout，这里只写正文。
+ */
+import { type Locale } from '../lib/posts';
+import { getProfile } from '../data/profile';
+import { categoryLabel, type Work } from '../data/works';
+
+interface Props {
+  locale: Locale;
+  work: Work;
+}
+
+const { locale, work } = Astro.props;
+const t = getProfile(locale);
+const ui = t.works;
+const BASE = import.meta.env.BASE_URL;
+const home = locale === 'zh' ? BASE : `${BASE}en/`;
+const text = work.text[locale];
+---
+
+<main class="site">
+  <article class="work">
+    <p class="work__back"><a href={`${home}#works`}>{ui.back}</a></p>
+
+    <header class="work__head">
+      <p class="page-head__label">{categoryLabel(work.category, locale)}</p>
+      <h1 class="work__title">{text.title}</h1>
+      {text.summary && <p class="work__summary">{text.summary}</p>}
+    </header>
+
+    <div class:list={['work__cover', work.cover && 'work__cover--image']} style={`--card-accent: ${work.accent ?? '#4f5d43'}`}>
+      {work.cover && <img src={BASE + work.cover.replace(/^\//, '')} alt="" />}
+    </div>
+
+    <dl class="work__meta">
+      <div class="work__meta-row">
+        <dt>{ui.yearLabel}</dt>
+        <dd>{work.year}</dd>
+      </div>
+      {
+        text.role && (
+          <div class="work__meta-row">
+            <dt>{ui.roleLabel}</dt>
+            <dd>{text.role}</dd>
+          </div>
+        )
+      }
+      {
+        work.tools.length > 0 && (
+          <div class="work__meta-row">
+            <dt>{ui.toolsLabel}</dt>
+            <dd>{work.tools.join(' / ')}</dd>
+          </div>
+        )
+      }
+      {
+        work.link && (
+          <div class="work__meta-row">
+            <dt>{ui.linkLabel}</dt>
+            <dd>
+              <a href={work.link} target="_blank" rel="noopener">
+                {work.link.replace(/^https?:\/\//, '')}
+              </a>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="work__body prose">
+      {text.body.filter(Boolean).map((p) => <p>{p}</p>)}
+    </div>
+  </article>
+</main>

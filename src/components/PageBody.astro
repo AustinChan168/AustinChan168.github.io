@@ -1,17 +1,26 @@
 ---
 /**
- * 首页正文。只在 index.astro 里用，外面套一层 BaseLayout。
+ * 首页正文：Hero → 作品 → 关于 → 最近写的。
+ * 这是视频里那套「作品站三模块」的落地顺序：先定位，再证明，再介绍自己。
+ *
  * Hero 的视觉重心是 motto，不是名字 —— 名字在顶栏里，滚动时也一直可见。
- * 想加回完整板块结构，看 git 历史里 commit 41ac065 之前的这个文件。
+ * 想加回更长的板块结构，看 git 历史里 commit 41ac065 之前的版本。
  */
 import { type Profile } from '../data/profile';
+import { getPosts, formatDate, type Locale } from '../lib/posts';
+import Works from './Works.astro';
+import About from './About.astro';
 
 interface Props {
   t: Profile;
+  locale: Locale;
 }
 
-const { t } = Astro.props;
+const { t, locale } = Astro.props;
 const BASE = import.meta.env.BASE_URL;
+const writingPrefix = locale === 'zh' ? 'writing' : 'en/writing';
+
+const posts = (await getPosts(locale)).slice(0, 3);
 ---
 
 <main class="site">
@@ -35,4 +44,32 @@ const BASE = import.meta.env.BASE_URL;
       }
     </div>
   </section>
+
+  <Works locale={locale} />
+
+  <About locale={locale} />
+
+  {
+    posts.length > 0 && (
+      <section class="latest" id="writing">
+        <div class="section__head">
+          <span class="section__index">03</span>
+          <h2 class="section__title">{t.home.writingTitle}</h2>
+        </div>
+        <ul class="latest__list">
+          {posts.map(({ entry, slug }) => (
+            <li class="latest__item">
+              <a class="latest__link" href={`${BASE}${writingPrefix}/${slug}/`}>
+                <span class="latest__date">{formatDate(entry.data.date, locale)}</span>
+                <span class="latest__title">{entry.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="latest__all">
+          <a href={`${BASE}${writingPrefix}/`}>{t.home.writingAll}</a>
+        </p>
+      </section>
+    )
+  }
 </main>

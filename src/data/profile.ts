@@ -36,6 +36,35 @@ export interface Profile {
     pages: { id: string; label: string; href: string }[];
     top: string;
   };
+  // 作品展示区的界面词。作品本身的数据在 src/data/works.ts
+  works: {
+    label: string;
+    title: string;
+    lead: string;
+    filterAll: string;
+    viewLabel: string;
+    empty: string;
+    roleLabel: string;
+    yearLabel: string;
+    toolsLabel: string;
+    linkLabel: string;
+    back: string;
+  };
+  // 个人介绍区（内容就在下面 ui 同级的 paragraphs / tags / now / contact）
+  about: {
+    label: string;
+    title: string;
+    paragraphs: string[];
+    tags: string[];
+    nowTitle: string;
+    now: { when: string; text: string }[];
+    contactTitle: string;
+    contact: { label: string; value: string; href?: string }[];
+  };
+  home: {
+    writingTitle: string;
+    writingAll: string;
+  };
   ui: {
     langLabel: string;
     lastUpdated: string;
@@ -69,13 +98,53 @@ const zh: Profile = {
     motto: '😶 An observer of the surging technological wave.',
     lead: '🌸 An undergraduate student studying at a university.',
     actions: [
-      { label: '文字 →', href: '/writing' },
+      { label: '作品 →', href: '/#works' },
+      { label: '文字', href: '/writing' },
       { label: 'GitHub ↗', href: 'https://github.com/AustinChan168', external: true },
     ],
   },
   nav: {
-    pages: [{ id: 'writing', label: '文字', href: '/writing' }],
+    pages: [
+      { id: 'works', label: '作品', href: '/#works' },
+      { id: 'writing', label: '文字', href: '/writing' },
+    ],
     top: '回到顶部',
+  },
+  works: {
+    label: 'Selected work',
+    title: '作品',
+    lead: '做过的项目，按类型分。点开看每一件具体做了什么。',
+    filterAll: '全部',
+    viewLabel: '查看项目 →',
+    empty: '还没有作品。先做一个能跑起来的最小版本，再放上来。',
+    roleLabel: '角色',
+    yearLabel: '年份',
+    toolsLabel: '工具',
+    linkLabel: '外部链接',
+    back: '← 全部作品',
+  },
+  about: {
+    label: 'About',
+    title: '关于',
+    paragraphs: [
+      '[一段自我介绍：你是谁、在做什么、想往哪走，三句以内。别写形容词，写事实。]',
+      '[再补一句：你为什么做这些事，或者你最在意什么。]',
+    ],
+    tags: ['[标签]', '[标签]', '[标签]', '[标签]'],
+    nowTitle: '现在',
+    now: [
+      { when: '[2026 · 秋]', text: '[现在在学什么 / 在做什么项目]' },
+      { when: '[下个阶段]', text: '[接下来要做的事]' },
+    ],
+    contactTitle: '联系',
+    contact: [
+      { label: 'Email', value: '[you@example.com]' },
+      { label: 'GitHub', value: 'AustinChan168', href: 'https://github.com/AustinChan168' },
+    ],
+  },
+  home: {
+    writingTitle: '最近写的',
+    writingAll: '全部文字 →',
   },
   ui: {
     langLabel: 'English',
@@ -110,13 +179,53 @@ const en: Profile = {
     motto: '😶 An observer of the surging technological wave.',
     lead: '🌸 An undergraduate student studying at a university.',
     actions: [
-      { label: 'Writing →', href: '/en/writing' },
+      { label: 'Work →', href: '/en/#works' },
+      { label: 'Writing', href: '/en/writing' },
       { label: 'GitHub ↗', href: 'https://github.com/AustinChan168', external: true },
     ],
   },
   nav: {
-    pages: [{ id: 'writing', label: 'Writing', href: '/en/writing' }],
+    pages: [
+      { id: 'works', label: 'Work', href: '/en/#works' },
+      { id: 'writing', label: 'Writing', href: '/en/writing' },
+    ],
     top: 'Back to top',
+  },
+  works: {
+    label: 'Selected work',
+    title: 'Work',
+    lead: 'Projects I have built, grouped by type. Open one to see what I actually did.',
+    filterAll: 'All',
+    viewLabel: 'View project →',
+    empty: 'Nothing here yet. Ship the smallest working version first, then put it up.',
+    roleLabel: 'Role',
+    yearLabel: 'Year',
+    toolsLabel: 'Tools',
+    linkLabel: 'Link',
+    back: '← All work',
+  },
+  about: {
+    label: 'About',
+    title: 'About',
+    paragraphs: [
+      '[One short paragraph: who you are, what you do, where you are heading. Facts, not adjectives.]',
+      '[One more line: why you do this, or what you care about most.]',
+    ],
+    tags: ['[tag]', '[tag]', '[tag]', '[tag]'],
+    nowTitle: 'Now',
+    now: [
+      { when: '[Autumn 2026]', text: '[What you are learning / building right now]' },
+      { when: '[Next]', text: '[What comes after that]' },
+    ],
+    contactTitle: 'Contact',
+    contact: [
+      { label: 'Email', value: '[you@example.com]' },
+      { label: 'GitHub', value: 'AustinChan168', href: 'https://github.com/AustinChan168' },
+    ],
+  },
+  home: {
+    writingTitle: 'Recent writing',
+    writingAll: 'All writing →',
   },
   ui: {
     langLabel: '中文',

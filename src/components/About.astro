@@ -1,0 +1,81 @@
+---
+/**
+ * 个人介绍区。内容全部在 src/data/profile.ts 的 about 字段里，
+ * 这里只负责排版：两段自述 + 标签 + 现在 + 联系方式。
+ */
+import { type Locale } from '../lib/posts';
+import { getProfile } from '../data/profile';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getProfile(locale);
+const about = t.about;
+---
+
+<section class="about" id="about">
+  <div class="section__head">
+    <span class="section__index">02</span>
+    <h2 class="section__title">{about.title}</h2>
+  </div>
+
+  <div class="about__grid">
+    <div class="about__text prose">
+      {about.paragraphs.filter(Boolean).map((p) => <p>{p}</p>)}
+      {
+        about.tags.filter(Boolean).length > 0 && (
+          <ul class="chips">
+            {about.tags.filter(Boolean).map((tag) => (
+              <li class="chip">{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    <div class="about__side">
+      {
+        about.now.length > 0 && (
+          <div class="now">
+            <h3 class="now__title">{about.nowTitle}</h3>
+            <ul class="now__list">
+              {about.now.map((item) => (
+                <li class="now__item">
+                  <span class="now__when">{item.when}</span>
+                  <span class="now__text">{item.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        about.contact.length > 0 && (
+          <div class="contact">
+            <h3 class="now__title">{about.contactTitle}</h3>
+            <ul class="contact__list">
+              {about.contact.map((c) =>
+                c.href ? (
+                  <li class="contact__item">
+                    <span class="contact__label">{c.label}</span>
+                    <a href={c.href} {...(c.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>
+                      {c.value}
+                    </a>
+                  </li>
+                ) : (
+                  <li class="contact__item contact__item--pending">
+                    <span class="contact__label">{c.label}</span>
+                    <span>{c.value}</span>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
