@@ -66,7 +66,8 @@ export interface Profile {
     writingAll: string;
   };
   ui: {
-    langLabel: string;
+    // 语言开关的无障碍标签（按钮本身固定写「中文 / EN」）
+    langSwitchLabel: string;
     lastUpdated: string;
     footerNote: string;
     writing: {
@@ -90,7 +91,7 @@ export interface Profile {
 
 const zh: Profile = {
   htmlLang: 'zh-CN',
-  title: 'Austin Chan · Who am I',
+  title: 'Austin Chan · 作品与文字',
   description: 'An observer of the surging technological wave. An undergraduate student studying at a university.',
   hero: {
     label: 'Who am I',
@@ -147,7 +148,7 @@ const zh: Profile = {
     writingAll: '全部文字 →',
   },
   ui: {
-    langLabel: 'English',
+    langSwitchLabel: '语言切换',
     lastUpdated: '最后更新 · 2026-10-27',
     footerNote: '',
     writing: {
@@ -171,7 +172,7 @@ const zh: Profile = {
 
 const en: Profile = {
   htmlLang: 'en',
-  title: 'Austin Chan · Who am I',
+  title: 'Austin Chan · Work & Writing',
   description: 'An observer of the surging technological wave. An undergraduate student studying at a university.',
   hero: {
     label: 'Who am I',
@@ -228,7 +229,7 @@ const en: Profile = {
     writingAll: 'All writing →',
   },
   ui: {
-    langLabel: '中文',
+    langSwitchLabel: 'Language',
     lastUpdated: 'Last updated · Oct 27, 2026',
     footerNote: '',
     writing: {

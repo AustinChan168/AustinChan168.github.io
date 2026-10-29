@@ -176,20 +176,44 @@ main,
   color: var(--accent);
 }
 
-.lang-toggle {
+/* 语言开关：中文 / EN 两段，当前语言反色高亮 */
+.lang-switch {
+  display: inline-flex;
+  align-items: stretch;
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 0.15rem 0.7rem;
+  overflow: hidden;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  white-space: nowrap;
+  line-height: 1.6;
 }
 
-.lang-toggle:hover {
-  border-color: var(--accent);
+.lang-switch__item {
+  border: 0;
+  padding: 0.1rem 0.6rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.lang-switch__item + .lang-switch__item {
+  border-left: 1px solid var(--line);
+}
+
+.lang-switch__item:hover {
+  color: var(--accent);
   background: var(--bg-soft);
+}
+
+.lang-switch__item.is-active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.lang-switch__item.is-active:hover {
+  background: var(--ink);
+  color: var(--bg);
 }
 
 @media (max-width: 720px) {

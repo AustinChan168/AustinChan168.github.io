@@ -29,6 +29,10 @@ const description = pageDescription ?? t.description;
 // canonical 与语言互跳地址都由 path 推导，各页面不用重复写
 const isEnglish = path.startsWith('/en/') || path === '/en/';
 const canonical = absoluteUrl(path);
+// 语言互跳：当前页在另一种语言里的地址（站内相对写法，用于顶部开关）
+const zhPath = isEnglish ? counterpartPath(path) : path;
+const enPath = isEnglish ? path : counterpartPath(path);
+const hrefFor = (p: string) => BASE + p.replace(/^\//, '');
 const zhUrl = isEnglish ? absoluteUrl(counterpartPath(path)) : canonical;
 const enUrl = isEnglish ? canonical : absoluteUrl(counterpartPath(path));
 
@@ -78,7 +82,22 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
             ))
           }
         </nav>
-        <a class="lang-toggle" href={BASE + counterpartPath(path).replace(/^\//, '')}>{t.ui.langLabel}</a>
+        <div class="lang-switch" role="group" aria-label={t.ui.langSwitchLabel}>
+          <a
+            class:list={['lang-switch__item', { 'is-active': !isEnglish }]}
+            href={hrefFor(zhPath)}
+            hreflang="zh-CN"
+            lang="zh-CN"
+            aria-current={!isEnglish ? 'true' : undefined}>中文</a
+          >
+          <a
+            class:list={['lang-switch__item', { 'is-active': isEnglish }]}
+            href={hrefFor(enPath)}
+            hreflang="en"
+            lang="en"
+            aria-current={isEnglish ? 'true' : undefined}>EN</a
+          >
+        </div>
       </div>
     </header>
 
