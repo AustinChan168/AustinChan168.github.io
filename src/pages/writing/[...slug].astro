@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostContent from '../../components/PostContent.astro';
 import { getProfile } from '../../data/profile';
-import { getPost, getPosts } from '../../lib/posts';
+import { getPost, getPosts, absoluteUrl } from '../../lib/posts';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts('zh');
@@ -18,6 +18,23 @@ export const getStaticPaths = (async () => {
 const { slug } = Astro.props;
 const t = getProfile('zh');
 const current = await getPost('zh', slug);
+const path = `/writing/${encodeURIComponent(slug)}/`;
+
+// 文章页的结构化数据：搜索引擎能识别出标题、作者、发布时间
+const jsonLd = current
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: current.entry.data.title,
+      description: current.entry.data.summary,
+      url: absoluteUrl(path),
+      mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(path) },
+      datePublished: current.entry.data.date.toISOString(),
+      inLanguage: 'zh-CN',
+      isPartOf: { '@id': `${absoluteUrl('/')}#website` },
+      author: { '@id': `${absoluteUrl('/')}#person` },
+    }
+  : null;
 ---
 
 <BaseLayout
@@ -25,7 +42,12 @@ const current = await getPost('zh', slug);
   pageTitle={current?.entry.data.title}
   pageDescription={current?.entry.data.summary}
   pageImage={current?.entry.data.cover}
-  path={`/writing/${encodeURIComponent(slug)}/`}
+  path={path}
 >
+  {
+    jsonLd && (
+      <script slot="extra-head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )
+  }
   <PostContent locale="zh" slug={slug} />
 </BaseLayout>

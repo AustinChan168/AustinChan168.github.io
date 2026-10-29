@@ -66,6 +66,47 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={ogImage} />
 
+    <script is:inline>
+      // 在首屏渲染前把主题写好，避免深色模式闪一下白
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          if (saved === 'dark' || saved === 'light') {
+            document.documentElement.setAttribute('data-theme', saved);
+          }
+        } catch (e) {
+          /* 隐私模式下 localStorage 可能不可用，忽略即可 */
+        }
+      })();
+    </script>
+
+    <!-- 结构化数据：告诉搜索引擎「这是一个人 + 一个站」，搜索结果有机会显示更丰富的卡片 -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Person',
+            '@id': `${absoluteUrl('/')}#person`,
+            name: t.hero.name,
+            url: canonical,
+            description,
+            sameAs: t.sameAs,
+          },
+          {
+            '@type': 'WebSite',
+            '@id': `${absoluteUrl('/')}#website`,
+            url: absoluteUrl('/'),
+            name: t.hero.name,
+            description,
+            inLanguage: isEnglish ? 'en' : 'zh-CN',
+            publisher: { '@id': `${absoluteUrl('/')}#person` },
+          },
+        ],
+      })}
+    />
+
     <slot name="extra-head" />
   </head>
   <body>
@@ -82,6 +123,11 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
             ))
           }
         </nav>
+
+        <button class="theme-toggle" type="button" aria-label={t.ui.themeLabel} title={t.ui.themeLabel}>
+          <span class="theme-toggle__glyph" aria-hidden="true">◐</span>
+        </button>
+
         <div class="lang-switch" role="group" aria-label={t.ui.langSwitchLabel}>
           <a
             class:list={['lang-switch__item', { 'is-active': !isEnglish }]}
@@ -102,6 +148,28 @@ const ogImage = absoluteUrl(pageImage ?? '/og-default.png');
     </header>
 
     <slot />
+
+    <script>
+      // 主题切换：手动选择存 localStorage，没选过时由 CSS 跟随系统
+      const root = document.documentElement;
+      const button = document.querySelector('.theme-toggle');
+
+      if (button) {
+        button.addEventListener('click', () => {
+          const saved = root.getAttribute('data-theme');
+          const isDark = saved
+            ? saved === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const next = isDark ? 'light' : 'dark';
+          root.setAttribute('data-theme', next);
+          try {
+            localStorage.setItem('theme', next);
+          } catch (e) {
+            /* 存不进去也不影响本次切换 */
+          }
+        });
+      }
+    </script>
 
     <div class="site">
       <footer class="site-footer">

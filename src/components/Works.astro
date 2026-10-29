@@ -5,7 +5,7 @@
  */
 import { type Locale } from '../lib/posts';
 import { getProfile } from '../data/profile';
-import { works, workCategories, categoryLabel } from '../data/works';
+import { works, workCategories, categoryLabel, coverOf } from '../data/works';
 
 interface Props {
   locale: Locale;
@@ -49,14 +49,15 @@ const usedCategories = workCategories.filter((c) => items.some((w) => w.category
         <ul class="cards">
           {items.map((w, i) => {
             const text = w.text[locale];
+            const cover = coverOf(w);
             return (
               <li class="card" data-category={w.category}>
                 <a class="card__link" href={`${BASE}${prefix}/${w.slug}/`}>
                   <div
-                    class:list={['card__cover', w.cover && 'card__cover--image']}
+                    class:list={['card__cover', cover && 'card__cover--image']}
                     style={`--card-accent: ${w.accent ?? '#4f5d43'}`}
                   >
-                    {w.cover && <img src={BASE + w.cover.replace(/^\//, '')} alt="" loading="lazy" />}
+                    {cover && <img src={BASE + cover.replace(/^\//, '')} alt="" loading="lazy" />}
                     <span class="card__num">{String(i + 1).padStart(2, '0')}</span>
                     <span class="card__cat">{categoryLabel(w.category, locale)}</span>
                   </div>

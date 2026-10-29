@@ -28,8 +28,29 @@
   --gap: clamp(2.5rem, 6vw, 4.5rem);
 }
 
+/*
+ * 深色模式有两级：
+ *   1) 手动切换 —— <html data-theme="dark|light">，存在 localStorage，优先级最高；
+ *   2) 跟随系统 —— 没手动设置过时，按 prefers-color-scheme 走（:not([data-theme]) 保证手动优先）。
+ */
+:root[data-theme='dark'] {
+  --bg: #14140f;
+  --bg-soft: #1c1c16;
+  --ink: #eeeade;
+  --ink-soft: #a9a698;
+  --ink-faint: #7b7a70;
+  --line: #2c2c23;
+  --line-soft: #232320;
+  --accent: #9fb187;
+
+  --done: #8ea073;
+  --doing: #cf9a4a;
+  --todo: #77766d;
+  --blocked: #c2705a;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #14140f;
     --bg-soft: #1c1c16;
     --ink: #eeeade;
@@ -174,6 +195,39 @@ main,
 
 .site-nav a:hover {
   color: var(--accent);
+}
+
+/* 深色模式切换按钮 */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-soft);
+}
+
+.theme-toggle__glyph {
+  transform: rotate(0deg);
+  transition: transform 0.35s ease;
+}
+
+.theme-toggle:hover .theme-toggle__glyph {
+  transform: rotate(180deg);
 }
 
 /* 语言开关：中文 / EN 两段，当前语言反色高亮 */
@@ -1162,6 +1216,69 @@ main,
   .work__meta-row {
     grid-template-columns: 4.2rem 1fr;
     gap: 0.7rem;
+  }
+}
+
+/* ---------- 作品详情页的素材区 + 图片放大 ---------- */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.3rem;
+  margin-top: 2.4rem;
+}
+
+.gallery__item {
+  margin: 0;
+}
+
+.gallery__item img,
+.gallery__item video {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--bg-soft);
+}
+
+.gallery__zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.gallery__item figcaption {
+  margin-top: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+.lightbox {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  max-width: 94vw;
+  max-height: 94vh;
+}
+
+.lightbox::backdrop {
+  background: rgba(12, 12, 9, 0.86);
+}
+
+.lightbox img {
+  max-width: 94vw;
+  max-height: 92vh;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .gallery {
+    grid-template-columns: 1fr;
   }
 }
 

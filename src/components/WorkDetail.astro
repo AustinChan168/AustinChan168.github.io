@@ -5,7 +5,7 @@
  */
 import { type Locale } from '../lib/posts';
 import { getProfile } from '../data/profile';
-import { categoryLabel, type Work } from '../data/works';
+import { categoryLabel, coverOf, type Work } from '../data/works';
 
 interface Props {
   locale: Locale;
@@ -18,6 +18,10 @@ const ui = t.works;
 const BASE = import.meta.env.BASE_URL;
 const home = locale === 'zh' ? BASE : `${BASE}en/`;
 const text = work.text[locale];
+const cover = coverOf(work);
+const media = work.media ?? [];
+/** public/ 下的路径 → 带 base 的地址 */
+const asset = (src: string) => BASE + src.replace(/^\//, '');
 ---
 
 <main class="site">
@@ -30,8 +34,8 @@ const text = work.text[locale];
       {text.summary && <p class="work__summary">{text.summary}</p>}
     </header>
 
-    <div class:list={['work__cover', work.cover && 'work__cover--image']} style={`--card-accent: ${work.accent ?? '#4f5d43'}`}>
-      {work.cover && <img src={BASE + work.cover.replace(/^\//, '')} alt="" />}
+    <div class:list={['work__cover', cover && 'work__cover--image']} style={`--card-accent: ${work.accent ?? '#4f5d43'}`}>
+      {cover && <img src={asset(cover)} alt="" />}
     </div>
 
     <dl class="work__meta">
@@ -72,5 +76,56 @@ const text = work.text[locale];
     <div class="work__body prose">
       {text.body.filter(Boolean).map((p) => <p>{p}</p>)}
     </div>
+
+    {
+      media.length > 0 && (
+        <section class="gallery">
+          {media.map((m) =>
+            m.type === 'video' ? (
+              <figure class="gallery__item">
+                <video
+                  src={asset(m.src)}
+                  poster={m.poster ? asset(m.poster) : undefined}
+                  controls
+                  playsinline
+                  preload="metadata"
+                ></video>
+                {m.label && <figcaption>{m.label}</figcaption>}
+              </figure>
+            ) : (
+              <figure class="gallery__item">
+                <button class="gallery__zoom" type="button" data-zoom={asset(m.src)}>
+                  <img src={asset(m.src)} alt={m.label ?? ''} loading="lazy" />
+                </button>
+                {m.label && <figcaption>{m.label}</figcaption>}
+              </figure>
+            )
+          )}
+        </section>
+      )
+    }
   </article>
 </main>
+
+<dialog class="lightbox">
+  <img alt="" />
+</dialog>
+
+<script>
+  // 图片点开放大：用原生 <dialog>，ESC 和点背景都能关
+  const dialog = document.querySelector('.lightbox');
+  const lightboxImg = dialog?.querySelector('img');
+
+  document.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!dialog || !lightboxImg) return;
+      lightboxImg.src = btn.dataset.zoom ?? '';
+      lightboxImg.alt = btn.querySelector('img')?.getAttribute('alt') ?? '';
+      dialog.showModal();
+    });
+  });
+
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+</script>

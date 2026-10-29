@@ -20,6 +20,8 @@ export interface Profile {
   title: string;
   // 一句话简介。显示在搜索结果和分享卡片里
   description: string;
+  // 搜索引擎用的「同一人」身份链接（GitHub、社交账号等），填你自己的主页地址
+  sameAs: string[];
   hero: {
     label: string;
     // 顶栏左上角 + 分享卡片里显示的名字
@@ -68,6 +70,8 @@ export interface Profile {
   ui: {
     // 语言开关的无障碍标签（按钮本身固定写「中文 / EN」）
     langSwitchLabel: string;
+    // 深色模式切换按钮的无障碍标签
+    themeLabel: string;
     lastUpdated: string;
     footerNote: string;
     writing: {
@@ -93,6 +97,7 @@ const zh: Profile = {
   htmlLang: 'zh-CN',
   title: 'Austin Chan · 作品与文字',
   description: 'An observer of the surging technological wave. An undergraduate student studying at a university.',
+  sameAs: ['https://github.com/AustinChan168'],
   hero: {
     label: 'Who am I',
     name: 'Austin Chan',
@@ -149,6 +154,7 @@ const zh: Profile = {
   },
   ui: {
     langSwitchLabel: '语言切换',
+    themeLabel: '切换深色 / 浅色',
     lastUpdated: '最后更新 · 2026-10-27',
     footerNote: '',
     writing: {
@@ -174,6 +180,7 @@ const en: Profile = {
   htmlLang: 'en',
   title: 'Austin Chan · Work & Writing',
   description: 'An observer of the surging technological wave. An undergraduate student studying at a university.',
+  sameAs: ['https://github.com/AustinChan168'],
   hero: {
     label: 'Who am I',
     name: 'Austin Chan',
@@ -230,6 +237,7 @@ const en: Profile = {
   },
   ui: {
     langSwitchLabel: 'Language',
+    themeLabel: 'Toggle dark mode',
     lastUpdated: 'Last updated · Oct 27, 2026',
     footerNote: '',
     writing: {

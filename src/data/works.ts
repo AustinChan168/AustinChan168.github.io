@@ -34,6 +34,17 @@ export interface WorkText {
   body: string[];
 }
 
+export interface WorkMedia {
+  /** image = 图片，video = 视频（视频会带原生播放器） */
+  type: 'image' | 'video';
+  /** 文件路径，放 public/ 下，例如 '/works/demo/screen.jpg' 或 '/works/demo/clip.mp4' */
+  src: string;
+  /** 视频封面，只在 type: 'video' 时用 */
+  poster?: string;
+  /** 图注，可写可不写 */
+  label?: string;
+}
+
 export interface Work {
   /** URL 用，英文小写 + 连字符，中英两版共用 */
   slug: string;
@@ -46,6 +57,12 @@ export interface Work {
   accent?: string;
   /** 封面图，放 public/ 下，例如 '/works/demo.jpg'。不填就用色块封面 */
   cover?: string;
+  /**
+   * 详情页的素材展示。图片点开可放大，视频带播放器。
+   * 例：media: [{ type: 'image', src: '/works/demo/1.jpg', label: '主界面' },
+   *            { type: 'video', src: '/works/demo/clip.mp4', poster: '/works/demo/cover.jpg' }]
+   */
+  media?: WorkMedia[];
   tools: string[];
   text: Record<Locale, WorkText>;
 }
@@ -139,6 +156,11 @@ export const works: Work[] = [
     },
   },
 ];
+
+/** 卡片封面：优先用 cover，没填 cover 就取 media 里第一张图片 */
+export function coverOf(work: Work): string | undefined {
+  return work.cover ?? work.media?.find((m) => m.type === 'image')?.src;
+}
 
 export function categoryLabel(key: WorkCategory, locale: Locale): string {
   const found = workCategories.find((c) => c.key === key);

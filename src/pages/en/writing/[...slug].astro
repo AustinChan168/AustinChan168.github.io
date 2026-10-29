@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostContent from '../../../components/PostContent.astro';
 import { getProfile } from '../../../data/profile';
-import { getPost, getPosts } from '../../../lib/posts';
+import { getPost, getPosts, absoluteUrl } from '../../../lib/posts';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts('en');
@@ -16,6 +16,22 @@ export const getStaticPaths = (async () => {
 const { slug } = Astro.props;
 const t = getProfile('en');
 const current = await getPost('en', slug);
+const path = `/en/writing/${encodeURIComponent(slug)}/`;
+
+const jsonLd = current
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: current.entry.data.title,
+      description: current.entry.data.summary,
+      url: absoluteUrl(path),
+      mainEntityOfPage: { '@type': 'WebPage', '@id': absoluteUrl(path) },
+      datePublished: current.entry.data.date.toISOString(),
+      inLanguage: 'en',
+      isPartOf: { '@id': `${absoluteUrl('/')}#website` },
+      author: { '@id': `${absoluteUrl('/')}#person` },
+    }
+  : null;
 ---
 
 <BaseLayout
@@ -23,7 +39,12 @@ const current = await getPost('en', slug);
   pageTitle={current?.entry.data.title}
   pageDescription={current?.entry.data.summary}
   pageImage={current?.entry.data.cover}
-  path={`/en/writing/${encodeURIComponent(slug)}/`}
+  path={path}
 >
+  {
+    jsonLd && (
+      <script slot="extra-head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )
+  }
   <PostContent locale="en" slug={slug} />
 </BaseLayout>
