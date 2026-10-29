@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# sitemap 交给搜索引擎自己发现页面
+Sitemap: https://austinchan168.github.io/sitemap.xml

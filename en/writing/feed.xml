@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Writing · Austin Chan</title>
+    <link>https://austinchan168.github.io/en/writing/</link>
+    <description>An observer of the surging technological wave. An undergraduate student studying at a university.</description>
+    <language>en-US</language>
+    <lastBuildDate>Mon, 26 Oct 2026 00:00:00 GMT</lastBuildDate>
+    <atom:link href="https://austinchan168.github.io/en/writing/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[Sample] How to write your first post</title>
+      <link>https://austinchan168.github.io/en/writing/first-post/</link>
+      <guid isPermaLink="true">https://austinchan168.github.io/en/writing/first-post/</guid>
+      <pubDate>Mon, 26 Oct 2026 00:00:00 GMT</pubDate>
+      <description>A placeholder post showing how Markdown renders here. Delete it once you start writing.</description>
+      <category>sample</category>
+    </item>
+  </channel>
+</rss>
